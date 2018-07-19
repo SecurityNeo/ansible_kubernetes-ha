@@ -1,0 +1,23 @@
+- name: Copy ETCD release packages to local_package_dir
+  copy:
+    src=files/etcd-v{{ etcd_major_version }}.{{ etcd_minor_version }}-linux-amd64.tar.gz
+    dest={{ local_package_dir }}/etcd/
+  connection=local
+  
+- name: Unarchived etcd file
+  unarchive:
+    src={{ local_package_dir }}/etcd/etcd-v{{ etcd_major_version }}.{{ etcd_minor_version }}-linux-amd64.tar.gz
+    dest={{ local_package_dir }}/etcd/
+    copy=no
+  connection=local
+  
+- name: Distribute etcd 
+  copy:
+    src={{ local_package_dir }}/etcd/etcd
+    dest={{ package_dir }}/bin/
+
+- name: Distribute etcdctl
+  copy:
+    src={{ local_package_dir }}/etcd/etcdctl
+    dest={{ package_dir }}/bin/
+    
