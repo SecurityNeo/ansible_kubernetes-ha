@@ -1,0 +1,58 @@
+- name: Make sure package binary dir created
+  file: 
+    path={{ local_package_dir }}/bin 
+    state=directory
+    connection=local
+    
+- name: Add the system envirment
+  shell:
+    export PATH={{ local_package_dir }}/bin:$PATH
+  connection=local
+    
+- name: Make sure package template dir created
+  file: 
+    path={{ local_template_dir }}/cfssl
+    state=directory
+  connection=local
+    
+- name: Copy the cfssl binary file
+  copy:
+    src=files/
+    des={{ local_package_dir }}/bin
+    mode=0755
+  connection=local
+
+- name: Copy the ca config template file
+  copy:
+    src=templates/ca-config.json.template
+    dest={{ local_template_dir }}/ca-config.json
+  connection=local
+
+- name: Copy the ca car template file
+  copy:
+    src=templates/ca-csr.json.template
+    dest={{ local_template_dir }}/ca-csr.json
+  connection=local
+
+- name: Generate CA certificate and private key
+  shell:
+    cd {{ local_template_dir }}/ && cfssl gencert -initca ca-csr.json | cfssljson -bare ca
+  connection=local
+ 
+- name: Distribute certificate files: ca.pem
+  copy:
+    src={{ local_template_dir }}/ca.pem
+    dest={{ kubernetes_cert_dir }}/
+    owner={{ k8s_user }}
+    
+- name: Distribute certificate files: ca-key.pem
+  copy:
+    src={{ local_template_dir }}/ca-key.pem
+    dest={{ kubernetes_cert_dir }}/
+    owner={{ k8s_user }}
+    
+- name: Distribute certificate files: ca-config.json
+  copy:
+    src={{ local_template_dir }}/ca-config.json
+    dest={{ kubernetes_cert_dir }}/
+    owner={{ k8s_user }}

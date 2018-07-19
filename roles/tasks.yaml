@@ -1,0 +1,10 @@
+- hosts: all
+  tasks:
+    - include: roles/general/tasks.yaml
+    - include: roles/haproxy/tasks.yaml
+    - include: roles/keepalived/tasks.yaml
+    - include: roles/cfssl/tasks.yaml
+    - include: roles/all/tasks.yaml
+    - include: roles/master/tasks.yaml
+    - include: roles/worker/tasks.yaml
+    - include: roles/addons/tasks.yaml

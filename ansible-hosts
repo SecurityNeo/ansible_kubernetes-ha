@@ -1,0 +1,7 @@
+[master] 
+master1 ansible_ssh_host=172.25.144.85 ansible_ssh_port=22 ansible_ssh_user=root  keepalived_priority=100
+master2 ansible_ssh_host=172.25.144.86 ansible_ssh_port=22 ansible_ssh_user=root  keepalived_priority=101
+master3 ansible_ssh_host=172.25.144.87 ansible_ssh_port=22 ansible_ssh_user=root  keepalived_priority=102
+[worker]
+worker1 ansible_ssh_host=172.25.144.89 ansible_ssh_port=22 ansible_ssh_user=root 
+worker2 ansible_ssh_host=172.25.144.90 ansible_ssh_port=22 ansible_ssh_user=root 
