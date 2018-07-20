@@ -2,9 +2,12 @@
   "CN": "etcd",
   "hosts": [
     "127.0.0.1",
-    "172.27.129.105",
-    "172.27.129.111",
-    "172.27.129.112"
+    {% for etcd_ip in master_servers %}
+      {% if loop.last %}
+	    "{{ etcd_ip}}"
+	  {% else %}
+	    "{{ etcd_ip}}",
+    {% endfor %}
   ],
   "key": {
     "algo": "rsa",

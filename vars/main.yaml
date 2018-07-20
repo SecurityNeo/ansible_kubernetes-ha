@@ -6,9 +6,10 @@ root_home_kube: /root/.kube
 etcd_major_version: 3.3
 etcd_minor_version: 7
 master_servers: 
-- { ip: "172.25.144.85" }
-- { ip: "172.25.144.86" }
-- { ip: "172.25.144.87" }
+- { ip: 172.25.144.85, node_name: "master01" }
+- { ip: 172.25.144.86, node_name: "master02" }
+- { ip: 172.25.144.87, node_name: "master03" }
+
 
 SERVICE_CIDR: 10.254.0.0/16
 CLUSTER_CIDR: 172.30.0.0/16
@@ -21,4 +22,6 @@ CLUSTER_KUBERNETES_SVC_IP: 10.254.0.1
 CLUSTER_DNS_SVC_IP: 10.254.0.2
 CLUSTER_DNS_DOMAIN: cluster.local.
 kubernetes_cert_dir: /etc/kubernetes/cert
+etcd_cert_dir: /etc/etcd/cert
+etcd_lib_dir: /var/lib/etcd
 k8s_user: k8s
