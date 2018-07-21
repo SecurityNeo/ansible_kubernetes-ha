@@ -1,0 +1,63 @@
+- name: Copy flannel release packages to local_package_dir
+  copy:
+    src=files/flannel-v{{ flannel_major_version }}.{{ flannel_minor_version }}-linux-amd64.tar.gz
+    dest={{ local_package_dir }}/flannel/
+  connection=local
+  
+- name: Unarchived flannel  file
+  unarchive:
+    src={{ local_package_dir }}/flannel/flannel-v{{ flannel_major_version }}.{{ flannel_minor_version }}-linux-amd64.tar.gz
+    dest={{ local_package_dir }}/flannel/
+    copy=no
+  connection=local
+  
+- name: Distribute flanneld 
+  copy:
+    src={{ local_package_dir }}/flannel/flanneld
+    dest={{ package_dir }}/bin/
+    owner={{ k8s_user }}
+    
+- name: Distribute mk-docker-opts.sh
+  copy:
+    src={{ local_package_dir }}/flannel/mk-docker-opts.sh
+    dest={{ package_dir }}/bin/
+    owner={{ k8s_user }}
+
+- name: Copy flanneld csr file
+  copy:
+    src=templates/flanneld-csr.json.template
+    dest={{ local_template_dir }}/flanneld-csr.json
+  connection=local
+  
+- name: Generate flanneld certificate and key file
+  shell:
+    cd {{ local_template_dir }}/ && cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes flanneld-csr.json | cfssljson -bare flanneld
+  cfssljson=local
+  
+- name: Distribute flanneld certificate files: flanneld.pem
+  copy:
+    src={{ local_template_dir }}/flanneld.pem
+    dest={{ flanneld_cert_dir }}/
+    owner={{ k8s_user }}
+    
+- name: Distribute flanneld certificate files: flanneld-key.pem
+  copy:
+    src={{ local_template_dir }}/flanneld-key.pem
+    dest={{ flanneld_cert_dir }}/
+    owner={{ k8s_user }}
+    
+- name: Generate flanneld service file
+  copy:
+    src=templates/flanneld.service.template
+    dest=/etc/systemd/system/flanneld.service
+    
+- name: Write networrk information to etcd cluster
+  shell:
+    etcdctl --endpoints={{ etcd_endpoints }} --ca-file={{ kubernetes_cert_dir }}/ca.pem --cert-file={{ flanneld_cert_dir }}/flanneld.pem --key-file={{ flanneld_cert_dir }}/flanneld-key.pem set {{ flannel_etcd_prefix }}/config '{"Network":"'{{ cluster_cider }}'", "SubnetLen": 24, "Backend": {"Type": "vxlan"}}'
+
+- name: Start flanneld service
+  service:
+    name=flanneld
+    state=started
+    enabled=yes
+    

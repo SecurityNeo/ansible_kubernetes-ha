@@ -25,6 +25,7 @@
   template: 
     src=templates/etcd-csr.json.j2 
     dest={{ local_template_dir }}/etcd-csr.json
+  connection=local
     
 - name: Generate ETCD  certificate and key file
   shell: 
@@ -37,7 +38,7 @@
     dest={{ etcd_cert_dir }}/
     owner={{ k8s_user }}
     
-- name: Distribute ETCD certificate files: ca-key.pem
+- name: Distribute ETCD certificate files: etcd-key.pem
   copy:
     src={{ local_template_dir }}/etcd-key.pem
     dest={{ etcd_cert_dir }}/
