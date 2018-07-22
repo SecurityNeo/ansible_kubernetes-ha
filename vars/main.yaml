@@ -8,6 +8,8 @@ etcd_major_version: 3.3
 etcd_minor_version: 7
 flannel_major_version: 0.10
 flannel_minor_version: 0
+docker_major_version: 18.03
+docker_minor_version: 1
 master_servers: 
 - { ip: 172.25.144.85, node_name: "master01" }
 - { ip: 172.25.144.86, node_name: "master02" }
@@ -29,5 +31,7 @@ kubernetes_cert_dir: /etc/kubernetes/cert
 flanneld_cert_dir: /etc/flanneld/cert
 etcd_cert_dir: /etc/etcd/cert
 etcd_lib_dir: /var/lib/etcd
+docker_conf_dir: /etc/docker
+docker_registry_mirrors: "https://hub-mirror.c.163.com", "https://docker.mirrors.ustc.edu.cn"
 k8s_user: k8s
 encryption_key:
