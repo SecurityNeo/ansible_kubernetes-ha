@@ -13,19 +13,21 @@ master_servers:
 - { ip: 172.25.144.86, node_name: "master02" }
 - { ip: 172.25.144.87, node_name: "master03" }
 
-
-SERVICE_CIDR: 10.254.0.0/16
-CLUSTER_CIDR: 172.30.0.0/16
-NODE_PORT_RANGE: 8400-9000
-MASTER_VIP: 172.5.144.88
+kubernetes_log_dir: /var/log/kubernetes
+service_cidr: 10.254.0.0/16
+cluster_cidr: 172.30.0.0/16
+node_port_range: 8400-9000
+master_vip: 172.5.144.88
 kube-apiserver: https://172.5.144.88:8443
 etcd_endpoints: https://172.25.144.85:2379,https://172.25.144.86:2379,https://172.25.144.87:2379
 flannel_etcd_prefix: /kubernetes/network
-CLUSTER_KUBERNETES_SVC_IP: 10.254.0.1
-CLUSTER_DNS_SVC_IP: 10.254.0.2
-CLUSTER_DNS_DOMAIN: cluster.local.
+cluster_kubernetes_svc_ip: 10.254.0.1
+cluster_dns_svc_ip: 10.254.0.2
+cluster_dns_domain: cluster.local.
+kubernetes_conf_dir: /etc/kubernetes
 kubernetes_cert_dir: /etc/kubernetes/cert
 flanneld_cert_dir: /etc/flanneld/cert
 etcd_cert_dir: /etc/etcd/cert
 etcd_lib_dir: /var/lib/etcd
 k8s_user: k8s
+encryption_key:

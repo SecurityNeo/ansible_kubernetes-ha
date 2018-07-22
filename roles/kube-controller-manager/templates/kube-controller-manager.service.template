@@ -1,0 +1,36 @@
+[Unit]
+Description=Kubernetes Controller Manager
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+
+[Service]
+ExecStart={{ package_dir }}/bin/kube-controller-manager \
+  --port=0 \
+  --secure-port=10252 \
+  --bind-address=127.0.0.1 \
+  --kubeconfig={{ kubernetes_conf_dir }}/kube-controller-manager.kubeconfig \
+  --service-cluster-ip-range={{ service_cidr }} \
+  --cluster-name=kubernetes \
+  --cluster-signing-cert-file={{ kubernetes_cert_dir }}/ca.pem \
+  --cluster-signing-key-file={{ kubernetes_cert_dir }}/ca-key.pem \
+  --experimental-cluster-signing-duration=8760h \
+  --root-ca-file={{ kubernetes_cert_dir }}/ca.pem \
+  --service-account-private-key-file={{ kubernetes_cert_dir }}/ca-key.pem \
+  --leader-elect=true \
+  --feature-gates=RotateKubeletServerCertificate=true \
+  --controllers=*,bootstrapsigner,tokencleaner \
+  --horizontal-pod-autoscaler-use-rest-clients=true \
+  --horizontal-pod-autoscaler-sync-period=10s \
+  --tls-cert-file={{ kubernetes_cert_dir }}/kube-controller-manager.pem \
+  --tls-private-key-file={{ kubernetes_cert_dir }}/kube-controller-manager-key.pem \
+  --use-service-account-credentials=true \
+  --alsologtostderr=true \
+  --logtostderr=false \
+  --log-dir={{ kubernetes_log_dir }} \
+  --v=2
+Restart=on
+Restart=on-failure
+RestartSec=5
+User={{ k8s_user }}
+
+[Install]
+WantedBy=multi-user.target

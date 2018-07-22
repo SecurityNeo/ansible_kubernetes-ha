@@ -33,6 +33,7 @@
   shell:
     cd {{ local_template_dir }}/ && cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes flanneld-csr.json | cfssljson -bare flanneld
   cfssljson=local
+  connection=local
   
 - name: Distribute flanneld certificate files: flanneld.pem
   copy:

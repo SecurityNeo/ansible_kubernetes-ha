@@ -1,0 +1,70 @@
+- name: Copy kubernetes master release packages to local_package_dir
+  copy:
+    src=files/kubernetes-server-linux-amd64.tar.gz
+    dest={{ local_package_dir }}/
+  connection=local
+
+- name: Unarchived kubernetes file
+  unarchive:
+    src={{ local_package_dir }}/kubernetes-server-linux-amd64.tar.gz
+    dest={{ local_package_dir }}/
+    copy=no
+  connection=local
+
+- name: Unarchived kubernetes src file
+  unarchive:
+    src={{ local_package_dir }}/kubernetes/kubernetes-src.tar.gz
+    dest={{ local_package_dir }}/kubernetes/
+    copy=no
+  connection=local
+
+- name: Distribute binary file
+  copy:
+    src={{ local_package_dir }}/kubernetes/server/bin/*
+    dest={{ package_dir }}/bin/
+    owner={{ k8s_user }}
+
+- name:  Copy kubernetes csr file
+  copy:
+    src=templates/kubernetes-csr.json.template
+    dest={{ local_template_dir }}/kubernetes-csr.json
+  connection=local
+
+- name: Generate kubernetes certificate and key file
+  shell:
+    cd {{ local_template_dir }}/ && cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kubernetes-csr.json | cfssljson -bare kubernetes
+  connection=local
+
+- name: Distribute kubernetes certificate files: kubernetes.pem
+  copy:
+    src={{ local_template_dir }}/kubernetes.pem
+    dest={{ kubernetes_cert_dir }}/
+    owner={{ k8s_user }}
+
+- name: Distribute kubernetes certificate files: kubernetes-key.pem
+  copy:
+    src={{ local_template_dir }}/kubernetes-key.pem
+    dest={{ kubernetes_cert_dir }}/
+    owner={{ k8s_user }}
+
+- name: Distribute kubernetes encryption config file
+  copy:
+    src=templates/encryption-config.yaml.template
+    dest={{ kubernetes_conf_dir }}/encryption-config.yaml
+
+- name: Distribute kubernetes service file
+  copy:
+    src=templates/kube-apiserver.service.template
+    dest=/etc/systemd/system/kube-apiserver.service
+
+- name: Grant authorization for kubernetes
+  shell:
+    kubectl create clusterrolebinding kube-apiserver:kubelet-apis --clusterrole=system:kubelet-api-admin --user kubernetes
+
+- name: Start kube-apiserver service
+  service:
+    name=kube-apiserver
+    state=started
+    enabled=yes
+
+

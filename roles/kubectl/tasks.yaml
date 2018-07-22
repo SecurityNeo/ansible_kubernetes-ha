@@ -65,7 +65,6 @@
   copy:
     src={{ local_template_dir }}/kubectl.kubeconfig
     dest={{root_home_kube}}/config
-    owner=root 
   
   
   
