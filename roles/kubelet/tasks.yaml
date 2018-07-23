@@ -54,4 +54,3 @@
   shell:
     scp templates/csr-crb.yaml.template root@{{ master_vip }}:{{ package_dir }}/sr-crb.yaml && kubectl apply -f {{ package_dir }}/csr-crb.yaml
   connection=local
-  
