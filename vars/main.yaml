@@ -5,7 +5,7 @@ k8s_home_kube: /home/k8s/.kube
 root_home_kube: /root/.kube
 bind_interface: eth0
 etcd_major_version: 3.3
-etcd_minor_version: 7
+etcd_minor_version: 7lo
 flannel_major_version: 0.10
 flannel_minor_version: 0
 docker_major_version: 18.03
@@ -16,6 +16,7 @@ master_servers:
 - { ip: 172.25.144.87, node_name: "master03" }
 
 kubernetes_log_dir: /var/log/kubernetes
+local_template_dir: /opt/template
 service_cidr: 10.254.0.0/16
 cluster_cidr: 172.30.0.0/16
 node_port_range: 8400-9000
