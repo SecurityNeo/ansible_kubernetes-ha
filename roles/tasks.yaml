@@ -4,7 +4,19 @@
     - include: roles/haproxy/tasks.yaml
     - include: roles/keepalived/tasks.yaml
     - include: roles/cfssl/tasks.yaml
-    - include: roles/all/tasks.yaml
-    - include: roles/master/tasks.yaml
-    - include: roles/worker/tasks.yaml
+    - include: roles/kubectl/tasks.yaml
+    - include: roles/flannel/tasks.yaml
+
+- hosts: master
+  tasks:
+    - include: roles/etcd/tasks.yaml
+    - include: roles/kube-apiserver/tasks.yaml
+    - include: roles/kube-controller-manager/tasks.yaml
+    - include: roles/kube-scheduler/tasks.yaml
+
+- hosts: worker
+  tasks:
+    - include: roles/docker/tasks.yaml
+    - include: roles/kubelet/tasks.yaml
+    - include: roles/kube-proxy/tasks.yaml
     - include: roles/addons/tasks.yaml

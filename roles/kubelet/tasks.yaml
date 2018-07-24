@@ -20,7 +20,7 @@
 
 - name: Configure use-context
   shell:
-    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/ kubectl config use-context default --kubeconfig=kubelet-bootstrap-{{ node_name }}.kubeconfig
+    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubectl config use-context default --kubeconfig=kubelet-bootstrap-{{ node_name }}.kubeconfig
   connection=local
 
 - name: Distribute kubelet file to user: k8s

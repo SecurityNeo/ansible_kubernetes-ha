@@ -15,13 +15,15 @@ master_servers:
 - { ip: 172.25.144.86, node_name: "master02" }
 - { ip: 172.25.144.87, node_name: "master03" }
 
+docker_group: docker
+k8s_user: k8s
 kubernetes_log_dir: /var/log/kubernetes
 local_template_dir: /opt/template
 service_cidr: 10.254.0.0/16
 cluster_cidr: 172.30.0.0/16
 node_port_range: 8400-9000
 master_vip: 172.5.144.88
-kube-apiserver: https://172.5.144.88:8443
+kube_apiserver: https://172.5.144.88:8443
 etcd_endpoints: https://172.25.144.85:2379,https://172.25.144.86:2379,https://172.25.144.87:2379
 flannel_etcd_prefix: /kubernetes/network
 cluster_kubernetes_svc_ip: 10.254.0.1
@@ -34,5 +36,4 @@ etcd_cert_dir: /etc/etcd/cert
 etcd_lib_dir: /var/lib/etcd
 docker_conf_dir: /etc/docker
 docker_registry_mirrors: "https://hub-mirror.c.163.com", "https://docker.mirrors.ustc.edu.cn"
-k8s_user: k8s
 encryption_key:
