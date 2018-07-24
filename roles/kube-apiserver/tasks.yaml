@@ -20,7 +20,7 @@
 
 - name: Distribute binary file
   copy:
-    src={{ local_package_dir }}/kubernetes/server/bin/*
+    src={{ local_package_dir }}/kubernetes/server/bin/
     dest={{ package_dir }}/bin/
     owner={{ k8s_user }}
 

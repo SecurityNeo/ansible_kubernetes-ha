@@ -13,7 +13,7 @@
 
 - name: Distribute binary file
   copy:
-    src={{ local_package_dir }}/docker/docker*
+    src={{ local_package_dir }}/docker/
     dest={{ package_dir }}/bin/
     owner={{ k8s_user }}
 
