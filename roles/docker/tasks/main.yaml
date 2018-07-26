@@ -1,15 +1,17 @@
 - name: Copy docker release packages to local_package_dir
   copy:
-    src=files/docker-{{ docker_major_version }}.{{ docker_minor_version }}-ce.tgz
+    src=files/docker-{{ docker_version }}-ce.tgz
     dest={{ local_package_dir }}/
-  connection=local
+  connection: local
+  ignore_errors: yes
 
 - name: Unarchived kubernetes file
   unarchive:
-    src={{ local_package_dir }}/docker-{{ docker_major_version }}.{{ docker_minor_version }}-ce.tgz
+    src={{ local_package_dir }}/docker-{{ docker_version }}-ce.tgz
     dest={{ local_package_dir }}/
     copy=no
-  connection=local
+  connection: local
+  ignore_errors: yes
 
 - name: Distribute binary file
   copy:

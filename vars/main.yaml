@@ -1,7 +1,7 @@
----
 package_dir: /opt/k8s
 k8s_home_kube: /home/k8s/.kube
 root_home_kube: /root/.kube
+local_package_dir: /opt/package
 local_template_dir: /opt/template
 kubernetes_log_dir: /var/log/kubernetes
 kubernetes_conf_dir: /etc/kubernetes
@@ -17,19 +17,13 @@ haproxy_src_dir: /tmp/kube_deploy
 haproxy_prefix_dir: /opt/ha/haproxy
 haproxy_conf_dir: /etc/haproxy
 
----
-flannel_major_version: 0.10
-flannel_minor_version: 0
-docker_major_version: 18.03
-docker_minor_version: 1
-etcd_major_version: 3.3
-etcd_minor_version: 7
-keepalived_major_version: 2.0
-keepalived_minor_version: 5
-haproxy_major_version: 1.8
-haproxy_minor_version: 12
+flannel_version: 0.10.0
+docker_version: 18.03.1
+etcd_version: 3.3.7
+keepalived_version: 2.0.5
+haproxy_version: 1.8.12
 
----
+
 haproxy_user: haproxy
 haproxy_group: haproxy
 haproxy_auth_name: admin
@@ -37,25 +31,26 @@ haproxy_auth_pass: cloudos
 docker_group: docker
 k8s_user: k8s
 
----
-master_servers: 
-- { name: 'k8s-api-1', ip: 172.25.144.85, port: "6443", node_name: "master01" }
-- { name: 'k8s-api-2', ip: 172.25.144.86, port: "6443", node_name: "master02" }
-- { name: 'k8s-api-3', ip: 172.25.144.87, port: "6443", node_name: "master03" }
 
----
+master_servers: 
+- { name: 'k8s-api-1', ip: "172.25.144.85", port: "6443", node_name: "master01" }
+- { name: 'k8s-api-2', ip: "172.25.144.86", port: "6443", node_name: "master02" }
+- { name: 'k8s-api-3', ip: "172.25.144.87", port: "6443", node_name: "master03" }
+
+
 haproxy_bind_port: 443
 bind_interface: eth0
 service_cidr: 10.254.0.0/16
 cluster_cidr: 172.30.0.0/16
 node_port_range: 8400-9000
-master_vip: 172.5.144.88
-kube_apiserver: https://172.5.144.88:8443
+master_vip: 172.25.144.88
+kube_apiserver: https://172.25.144.88:8443
 etcd_endpoints: https://172.25.144.85:2379,https://172.25.144.86:2379,https://172.25.144.87:2379
+etcd_nodes: master01=https://172.25.144.85:2380,master02=https://172.25.144.86:2380,master03=https://172.25.144.87:2380
 flannel_etcd_prefix: /kubernetes/network
 cluster_kubernetes_svc_ip: 10.254.0.1
 cluster_dns_svc_ip: 10.254.0.2
 cluster_dns_domain: cluster.local.
-docker_registry_mirrors: "https://hub-mirror.c.163.com", "https://docker.mirrors.ustc.edu.cn"
+docker_registry_mirrors: ["https://hub-mirror.c.163.com", "https://docker.mirrors.ustc.edu.cn"]
 haproxy_make_option: TARGET=linux2628 CPU=x86_64 USE_OPENSSL=1 USE_ZLIB=1 USE_PCRE=1
 encryption_key: Zs8dTG08K3BlA5TGKtKbjMOfHDd0wa92s+Y6RNDwtaE=

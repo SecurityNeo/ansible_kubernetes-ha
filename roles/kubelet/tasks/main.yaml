@@ -1,29 +1,34 @@
 - name: Create token
   shell:
     kubeadm token create --description kubelet-bootstrap-token --groups system:bootstrappers:{{ node_name }} --kubeconfig {{ local_template_dir }}kubectl.kubeconfig > {{ node_name }}.token
-  connection=local
+  connection: local
+  ignore_errors: yes
 
 - name: Configure k8s cluster parameter
   shell:
-    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubectl config set-cluster kubernetes --certificate-authority=ca.pem --embed-certs=true --server={{ kube_apiserver }} --kubeconfig=kubelet-bootstrap-{{ node_name }}.kubeconfig
-  connection=local
+    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config set-cluster kubernetes --certificate-authority=ca.pem --embed-certs=true --server={{ kube_apiserver }} --kubeconfig=kubelet-bootstrap-{{ node_name }}.kubeconfig
+  connection: local
+  ignore_errors: yes
 
 - name: Configure k8s client certificate parameter
   shell:
-    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubectl config set-credentials kubelet-bootstrap --token=`cat {{ node_name }}.token` --kubeconfig=kubelet-bootstrap-{{ node_name }}.kubeconfig
-  connection=local
+    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config set-credentials kubelet-bootstrap --token=`cat {{ node_name }}.token` --kubeconfig=kubelet-bootstrap-{{ node_name }}.kubeconfig
+  connection: local
+  ignore_errors: yes
 
 - name: Configure context parameter
   shell:
-    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubectl config set-context default --cluster=kubernetes --user=kubelet-bootstrap --kubeconfig=kubelet-bootstrap-{{ node_name }}.kubeconfig
-  connection=local
+    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config set-context default --cluster=kubernetes --user=kubelet-bootstrap --kubeconfig=kubelet-bootstrap-{{ node_name }}.kubeconfig
+  connection: local
+  ignore_errors: yes
 
 - name: Configure use-context
   shell:
-    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubectl config use-context default --kubeconfig=kubelet-bootstrap-{{ node_name }}.kubeconfig
-  connection=local
+    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config use-context default --kubeconfig=kubelet-bootstrap-{{ node_name }}.kubeconfig
+  connection: local
+  ignore_errors: yes
 
-- name: Distribute kubelet file to user: k8s
+- name: Distribute kubelet file to user k8s
   copy:
     src={{ local_template_dir }}/kubelet-bootstrap-{{ node_name }}.kubeconfig
     dest={{ kubernetes_conf_dir }}/kubelet-bootstrap.kubeconfig
@@ -42,15 +47,17 @@
 - name: Create clusterrole binding
   shell:
     ssh root@{{ master_vip }}"kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --group=system:bootstrappers"
-  connection=local
+  connection: local
+  ignore_errors: yes
 
 - name: Start kubelet service
   service:
     name=kubelet
-    state:started
+    state=started
     enabled=yes
 
 - name: Distribute csr-crb.yaml to master_vip
   shell:
     scp templates/csr-crb.yaml.template root@{{ master_vip }}:{{ package_dir }}/sr-crb.yaml && kubectl apply -f {{ package_dir }}/csr-crb.yaml
-  connection=local
+  connection: local
+  ignore_errors: yes

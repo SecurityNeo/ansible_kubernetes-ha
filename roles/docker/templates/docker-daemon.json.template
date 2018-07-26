@@ -1,4 +1,4 @@
 {
-    "registry-mirrors": [{{ docker_registry_mirrors }}],
+    "registry-mirrors": {{ docker_registry_mirrors }},
     "max-concurrent-downloads": 20
 }

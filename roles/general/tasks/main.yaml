@@ -1,8 +1,12 @@
-- name: Add group: docker
+- name: Stop selinux
+  selinux:
+    state: disabled
+
+- name: Add group docker
   group:
     name={{ docker_group }}
 
-- name: Add user: k8s
+- name: Add user k8s
   user:
     name={{ k8s_user }}
     group={{ docker_group }}
@@ -47,13 +51,13 @@
     state=directory
     owenr={{ k8s_user }}
 
-- name: Create kube config dir: k8s
+- name: Create kube config dir
   file:
     path={{ k8s_home_kube }}
     state=directory
     owenr={{ k8s_user }}
 
-- name: Create kube config dir: root
+- name: Create kube config dir
   file:
     path={{ root_home_kube }}
     state=directory
@@ -68,12 +72,8 @@
   file:
     path={{ local_template_dir }}
     state=directory
-
-- name: Create kubernetes config dir
-  file:
-    path={{ kubernetes_conf_dir }}
-    state=directory
-    owenr={{ k8s_user }}
+  connection: local
+  ignore_errors: yes
 
 - name: Create kubernetes config dir
   file:
@@ -106,8 +106,6 @@
 - name: Stop dnsmasq
   shell:
     service dnsmasq stop && systemctl disable dnsmasq
-
-- name:
 
 - name: Modify kernel parameter
   sysctl:
@@ -158,25 +156,10 @@
     state=present
     ignoreerrors=yes
 
-- name: Load kernel module
-  shell:
-    modprobe br_netfilter && modprobe ip_vs
-
 - name: Setting up the system time zone
   shell:
     timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0 && systemctl restart rsyslog && systemctl restart crond
 
-- name:
-
-- name: Stop selinux
-  selinux:
-    state: disabled
-
-- name: Modify selinux configuration
-  replace:
-    path: /etc/selinux/config
-    regexp: '=enforcing'
-    replace: '=disabled'
 
 - name: Install the dependencies
   yum: name={{ item }} state=installed
@@ -195,3 +178,7 @@
     - curl
     - iptables
   when: ansible_os_family == "RedHat"
+
+- name: Load kernel module
+  shell:
+    modprobe br_netfilter && modprobe ip_vs

@@ -11,18 +11,18 @@
   
 - name: Copy the src to target hosts
   copy: 
-    src=files/keepalived-{{ keepalived_major_version }}.{{ keepalived_minor_version }}.tar.gz
+    src=files/keepalived-{{ keepalived_version }}.tar.gz
     dest={{ keepalived_src_dir }}
     
 - name: Unarchived keepalived package
   unarchive: 
-    src={{ haproxy_src_dir }}/keepalived-{{ keepalived_major_version }}.{{ keepalived_minor_version }}.tar.gz
+    src={{ haproxy_src_dir }}/keepalived-{{ keepalived_version }}.tar.gz
     dest={{ keepalived_src_dir }}/
     copy=no
     
 - name: Compile the source code
   shell: 
-    cd {{ haproxy_src_dir }}/keepalived-{{ keepalived_major_version }}.{{ keepalived_minor_version }}  && ./configure --prefix={{ keepalived_prefix_dir }} && make && make install
+    cd {{ haproxy_src_dir }}/keepalived-{{ keepalived_version }}  && ./configure --prefix={{ keepalived_prefix_dir }} && make && make install
     
 - name: Copy Keepalived configure file 
   template: 

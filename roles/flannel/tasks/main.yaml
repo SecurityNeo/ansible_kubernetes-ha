@@ -1,15 +1,17 @@
 - name: Copy flannel release packages to local_package_dir
   copy:
-    src=files/flannel-v{{ flannel_major_version }}.{{ flannel_minor_version }}-linux-amd64.tar.gz
+    src=files/flannel-v{{ flannel_version }}}-linux-amd64.tar.gz
     dest={{ local_package_dir }}/flannel/
-  connection=local
+  connection: local
+  ignore_errors: yes
   
 - name: Unarchived flannel  file
   unarchive:
-    src={{ local_package_dir }}/flannel/flannel-v{{ flannel_major_version }}.{{ flannel_minor_version }}-linux-amd64.tar.gz
+    src={{ local_package_dir }}/flannel/flannel-v{{ flannel_version }}-linux-amd64.tar.gz
     dest={{ local_package_dir }}/flannel/
     copy=no
-  connection=local
+  connection: local
+  ignore_errors: yes
   
 - name: Distribute flanneld 
   copy:
@@ -27,21 +29,22 @@
   copy:
     src=templates/flanneld-csr.json.template
     dest={{ local_template_dir }}/flanneld-csr.json
-  connection=local
+  connection: local
+  ignore_errors: yes
   
 - name: Generate flanneld certificate and key file
   shell:
     cd {{ local_template_dir }}/ && cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes flanneld-csr.json | cfssljson -bare flanneld
-  cfssljson=local
-  connection=local
+  connection: local
+  ignore_errors: yes
   
-- name: Distribute flanneld certificate files: flanneld.pem
+- name: Distribute flanneld certificate files
   copy:
     src={{ local_template_dir }}/flanneld.pem
     dest={{ flanneld_cert_dir }}/
     owner={{ k8s_user }}
     
-- name: Distribute flanneld certificate files: flanneld-key.pem
+- name: Distribute flanneld certificate files
   copy:
     src={{ local_template_dir }}/flanneld-key.pem
     dest={{ flanneld_cert_dir }}/
@@ -52,9 +55,16 @@
     src=templates/flanneld.service.template
     dest=/etc/systemd/system/flanneld.service
     
+- name: Copy update-flanneld script
+  template:
+    src=templates/update-flanneld.sh.j2
+    dest={{ package_dir }}/update-flanneld.sh
+
 - name: Write networrk information to etcd cluster
   shell:
-    etcdctl --endpoints={{ etcd_endpoints }} --ca-file={{ kubernetes_cert_dir }}/ca.pem --cert-file={{ flanneld_cert_dir }}/flanneld.pem --key-file={{ flanneld_cert_dir }}/flanneld-key.pem set {{ flannel_etcd_prefix }}/config '{"Network":"'{{ cluster_cider }}'", "SubnetLen": 24, "Backend": {"Type": "vxlan"}}'
+    ssh root@{{ master_vip }} "sh {{ package_dir }}/update-flanneld.sh"
+  connection: local
+  ignore_errors: yes
 
 - name: Start flanneld service
   service:

@@ -1,44 +1,50 @@
 - name: Copy ETCD release packages to local_package_dir
   copy:
-    src=files/etcd-v{{ etcd_major_version }}.{{ etcd_minor_version }}-linux-amd64.tar.gz
+    src=files/etcd-v{{ etcd_version }}-linux-amd64.tar.gz
     dest={{ local_package_dir }}/etcd/
-  connection=local
+  connection: local
+  ignore_errors: yes
   
 - name: Unarchived ETCD  file
   unarchive:
-    src={{ local_package_dir }}/etcd/etcd-v{{ etcd_major_version }}.{{ etcd_minor_version }}-linux-amd64.tar.gz
+    src={{ local_package_dir }}/etcd/etcd-v{{ etcd_version }}-linux-amd64.tar.gz
     dest={{ local_package_dir }}/etcd/
     copy=no
-  connection=local
+  connection: local
+  ignore_errors: yes
   
 - name: Distribute etcd 
   copy:
     src={{ local_package_dir }}/etcd/etcd
     dest={{ package_dir }}/bin/
+    mode=0755
 
 - name: Distribute etcdctl
   copy:
     src={{ local_package_dir }}/etcd/etcdctl
     dest={{ package_dir }}/bin/
+    mode=0755
 
 - name: Copy ETCD csr file 
   template: 
     src=templates/etcd-csr.json.j2 
     dest={{ local_template_dir }}/etcd-csr.json
-  connection=local
+  connection: local
+  ignore_errors: yes
     
 - name: Generate ETCD  certificate and key file
   shell: 
     cd {{ local_template_dir }}/ && cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes etcd-csr.json | cfssljson -bare etcd
-  connection=local
+  connection: local
+  ignore_errors: yes
   
-- name:  Distribute ETCD certificate files: etcd.pem
+- name:  Distribute ETCD certificate files
   copy:
     src={{ local_template_dir }}/etcd.pem
     dest={{ etcd_cert_dir }}/
     owner={{ k8s_user }}
     
-- name: Distribute ETCD certificate files: etcd-key.pem
+- name: Distribute ETCD certificate files
   copy:
     src={{ local_template_dir }}/etcd-key.pem
     dest={{ etcd_cert_dir }}/
@@ -46,23 +52,24 @@
     
 - name: Copy ETCD service file to local_template_dir
   copy:
-    src=templates/etcd.service.templates/
+    src=templates/etcd.service.template
     dest={{ local_template_dir }}
-  connection=local
+  connection: local
+  ignore_errors: yes
     
-- name: Generate ETCD service file
-  shell:
-    cd {{ local_template_dir }} &&  sed -e "s/##NODE_IP##/{{ item.ip }}/" -e "s/##NODE_NAME##/{{ item.node_name }}/" etcd.service.template > etcd-{{ item.ip }}.service 
-  with_items:
-  - {{ master_servers }}
-  connection=local
+- name: Copy genetcd-service script file
+  template:
+    src=templates/genetcd-service.sh.j2
+    dest={{ local_template_dir }}/genetcd-service.sh
+    mode=0755
+  connection: local
+  ignore_errors: yes
 
 - name: Distribute ETCD service file
   shell:
-    scp {{ local_template_dir }}/etcd-{{ item.ip }}.service root@{{ item.ip }}:/etc/systemd/system/etcd.service
-  with_items:
-  - {{ master_servers }}
-  connection=local
+    sh {{ local_template_dir }}/genetcd-service.sh
+  connection: local
+  ignore_errors: yes
 
 - name: Start ETCD service
   service:
