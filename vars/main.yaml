@@ -1,24 +1,51 @@
 ---
-
 package_dir: /opt/k8s
 k8s_home_kube: /home/k8s/.kube
 root_home_kube: /root/.kube
-bind_interface: eth0
-etcd_major_version: 3.3
-etcd_minor_version: 7lo
+local_template_dir: /opt/template
+kubernetes_log_dir: /var/log/kubernetes
+kubernetes_conf_dir: /etc/kubernetes
+kubernetes_cert_dir: /etc/kubernetes/cert
+flanneld_cert_dir: /etc/flanneld/cert
+etcd_cert_dir: /etc/etcd/cert
+etcd_lib_dir: /var/lib/etcd
+docker_conf_dir: /etc/docker
+keepalived_src_dir: /tmp/kube_deploy
+keepalived_prefix_dir: /opt/ha/keepalived
+keepalived_conf_dir: /etc/keepalived
+haproxy_src_dir: /tmp/kube_deploy
+haproxy_prefix_dir: /opt/ha/haproxy
+haproxy_conf_dir: /etc/haproxy
+
+---
 flannel_major_version: 0.10
 flannel_minor_version: 0
 docker_major_version: 18.03
 docker_minor_version: 1
-master_servers: 
-- { ip: 172.25.144.85, node_name: "master01" }
-- { ip: 172.25.144.86, node_name: "master02" }
-- { ip: 172.25.144.87, node_name: "master03" }
+etcd_major_version: 3.3
+etcd_minor_version: 7
+keepalived_major_version: 2.0
+keepalived_minor_version: 5
+haproxy_major_version: 1.8
+haproxy_minor_version: 12
 
+---
+haproxy_user: haproxy
+haproxy_group: haproxy
+haproxy_auth_name: admin
+haproxy_auth_pass: cloudos
 docker_group: docker
 k8s_user: k8s
-kubernetes_log_dir: /var/log/kubernetes
-local_template_dir: /opt/template
+
+---
+master_servers: 
+- { name: 'k8s-api-1', ip: 172.25.144.85, port: "6443", node_name: "master01" }
+- { name: 'k8s-api-2', ip: 172.25.144.86, port: "6443", node_name: "master02" }
+- { name: 'k8s-api-3', ip: 172.25.144.87, port: "6443", node_name: "master03" }
+
+---
+haproxy_bind_port: 443
+bind_interface: eth0
 service_cidr: 10.254.0.0/16
 cluster_cidr: 172.30.0.0/16
 node_port_range: 8400-9000
@@ -29,11 +56,6 @@ flannel_etcd_prefix: /kubernetes/network
 cluster_kubernetes_svc_ip: 10.254.0.1
 cluster_dns_svc_ip: 10.254.0.2
 cluster_dns_domain: cluster.local.
-kubernetes_conf_dir: /etc/kubernetes
-kubernetes_cert_dir: /etc/kubernetes/cert
-flanneld_cert_dir: /etc/flanneld/cert
-etcd_cert_dir: /etc/etcd/cert
-etcd_lib_dir: /var/lib/etcd
-docker_conf_dir: /etc/docker
 docker_registry_mirrors: "https://hub-mirror.c.163.com", "https://docker.mirrors.ustc.edu.cn"
-encryption_key:
+haproxy_make_option: TARGET=linux2628 CPU=x86_64 USE_OPENSSL=1 USE_ZLIB=1 USE_PCRE=1
+encryption_key: Zs8dTG08K3BlA5TGKtKbjMOfHDd0wa92s+Y6RNDwtaE=
