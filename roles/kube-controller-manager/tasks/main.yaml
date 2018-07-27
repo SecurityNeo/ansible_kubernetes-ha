@@ -1,7 +1,7 @@
 - name: Copy kube-controller-manager csr file
   template:
-    src=templates/kube-controller-manager.json.j2
-    dest={{ local_template_dir }}/kube-controller-manager.json
+    src=templates/kube-controller-manager-csr.json.j2
+    dest={{ local_template_dir }}/kube-controller-manager-csr.json
   connection: local
   ignore_errors: yes
 
@@ -54,8 +54,8 @@
     owner={{ k8s_user }}
 
 - name: Distribute kube-controller-manager service file
-  copy:
-    src=templates/kube-controller-manager.service.template
+  template:
+    src=templates/kube-controller-manager.service.j2
     dest=/etc/systemd/system/kube-controller-manager.service
 
 - name: Start kube-controller-manager service

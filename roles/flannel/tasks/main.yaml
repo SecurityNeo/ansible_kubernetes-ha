@@ -18,12 +18,14 @@
     src={{ local_package_dir }}/flannel/flanneld
     dest={{ package_dir }}/bin/
     owner={{ k8s_user }}
+    mode=0755
     
 - name: Distribute mk-docker-opts.sh
   copy:
     src={{ local_package_dir }}/flannel/mk-docker-opts.sh
     dest={{ package_dir }}/bin/
     owner={{ k8s_user }}
+    mode=0755
 
 - name: Copy flanneld csr file
   copy:

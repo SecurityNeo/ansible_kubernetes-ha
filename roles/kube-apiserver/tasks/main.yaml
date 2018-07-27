@@ -53,23 +53,23 @@
     owner={{ k8s_user }}
 
 - name: Distribute kubernetes encryption config file
-  copy:
-    src=templates/encryption-config.yaml.template
+  template:
+    src=templates/encryption-config.yaml.j2
     dest={{ kubernetes_conf_dir }}/encryption-config.yaml
 
 - name: Distribute kubernetes service file
-  copy:
-    src=templates/kube-apiserver.service.template
+  template:
+    src=templates/kube-apiserver.service.j2
     dest=/etc/systemd/system/kube-apiserver.service
-
-- name: Grant authorization for kubernetes
-  shell:
-    kubectl create clusterrolebinding kube-apiserver:kubelet-apis --clusterrole=system:kubelet-api-admin --user kubernetes
 
 - name: Start kube-apiserver service
   service:
     name=kube-apiserver
     state=started
     enabled=yes
+
+- name: Grant authorization for kubernetes
+  shell:
+    kubectl create clusterrolebinding kube-apiserver:kubelet-apis --clusterrole=system:kubelet-api-admin --user kubernetes
 
 

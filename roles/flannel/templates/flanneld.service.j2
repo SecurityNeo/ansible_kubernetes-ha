@@ -15,7 +15,7 @@ ExecStart={{ package_dir }}/bin/flanneld \
   -etcd-endpoints={{ etcd_endpoints }} \
   -etcd-prefix={{ flannel_etcd_prefix }} \
   -iface={{ bind_interface }}
-ExecStartPost={{ package_dir }}}/bin/mk-docker-opts.sh -k DOCKER_NETWORK_OPTIONS -d /run/flannel/docker
+ExecStartPost={{ package_dir }}/bin/mk-docker-opts.sh -k DOCKER_NETWORK_OPTIONS -d /run/flannel/docker
 Restart=on-failure
 
 [Install]

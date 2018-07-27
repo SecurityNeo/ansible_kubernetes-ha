@@ -42,13 +42,13 @@
     owner={{ k8s_user }}
 
 - name: Distribute kube-proxy config file
-  copy:
-    src=templates/kube-proxy.config.yaml.template
+  template:
+    src=templates/kube-proxy.config.yaml.j2
     dest={{ kubernetes_conf_dir }}/kube-proxy.config.yaml
 
 - name: Distribute kube-proxy service file
-  copy:
-    src=templates/kube-proxy.service.template
+  template:
+    src=templates/kube-proxy.service.j2
     dest=/etc/systemd/system/kube-proxy.service
 
 - name: Start kube-proxy service
