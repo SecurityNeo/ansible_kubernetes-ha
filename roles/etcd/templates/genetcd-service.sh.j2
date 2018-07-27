@@ -1,5 +1,5 @@
 #!/bin/bash
 {% for server in master_servers %}
-  sed -e "s/##NODE_IP##/{{ server.ip }}/" -e "s/##NODE_NAME##/{{ server.node_name }}/" {{ local_template_dir }}/etcd.service.template > {{ local_template_dir }}/etcd-{{ server.ip }}.service
+  sed -e "s/##NODE_IP##/{{ server.ip }}/" -e "s/##NODE_NAME##/{{ server.node_name }}/" {{ local_template_dir }}/etcd.service > {{ local_template_dir }}/etcd-{{ server.ip }}.service
   scp {{ local_template_dir }}/etcd-{{ server.ip }}.service root@{{ server.ip }}:/etc/systemd/system/etcd.service
 {% endfor %}

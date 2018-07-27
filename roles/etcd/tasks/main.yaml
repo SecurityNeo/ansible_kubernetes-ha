@@ -51,11 +51,10 @@
     owner={{ k8s_user }}
     
 - name: Copy ETCD service file to local_template_dir
-  copy:
-    src=templates/etcd.service.template
-    dest={{ local_template_dir }}
+  template:
+    src=templates/etcd.service.j2
+    dest={{ local_template_dir }}/etcd.service
   connection: local
-  ignore_errors: yes
     
 - name: Copy genetcd-service script file
   template:

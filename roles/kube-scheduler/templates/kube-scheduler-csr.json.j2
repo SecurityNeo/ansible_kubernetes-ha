@@ -2,11 +2,12 @@
     "CN": "system:kube-scheduler",
     "hosts": [
       "127.0.0.1",
-      {% for etcd_ip in master_servers %}
+      {% for ip in master_servers %}
       {% if loop.last %}
-	    "{{ etcd_ip}}"
+	  "{{ ip.ip }}"
 	  {% else %}
-	    "{{ etcd_ip}}",
+	  "{{ ip.ip}}",
+	  {% endif %}
       {% endfor %}
     ],
     "key": {

@@ -51,14 +51,21 @@
     owner={{ k8s_user }}
     
 - name: Generate flanneld service file
+  template:
+    src=templates/flanneld.service.j2
+    dest={{ local_template_dir }}/flanneld.service
+  connection: local
+
+- name: Distribute flanneld service file
   copy:
-    src=templates/flanneld.service.template
+    src={{ local_template_dir }}/flanneld.service
     dest=/etc/systemd/system/flanneld.service
     
 - name: Copy update-flanneld script
   template:
     src=templates/update-flanneld.sh.j2
     dest={{ package_dir }}/update-flanneld.sh
+    mode=0755
 
 - name: Write networrk information to etcd cluster
   shell:
