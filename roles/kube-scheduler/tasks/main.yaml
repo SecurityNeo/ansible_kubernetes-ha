@@ -1,7 +1,7 @@
 - name: Copy kube-scheduler csr file
   template:
-    src=templates/kube-scheduler.json.j2
-    dest={{ local_template_dir }}/kube-scheduler.json
+    src=templates/kube-scheduler-csr.json.j2
+    dest={{ local_template_dir }}/kube-scheduler-csr.json
   connection: local
   ignore_errors: yes
 

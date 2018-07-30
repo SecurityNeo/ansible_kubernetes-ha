@@ -51,6 +51,8 @@ flannel_etcd_prefix: /kubernetes/network
 cluster_kubernetes_svc_ip: 10.254.0.1
 cluster_dns_svc_ip: 10.254.0.2
 cluster_dns_domain: cluster.local.
-docker_registry_mirrors: ["https://hub-mirror.c.163.com", "https://docker.mirrors.ustc.edu.cn"]
 haproxy_make_option: TARGET=linux2628 CPU=x86_64 USE_OPENSSL=1 USE_ZLIB=1 USE_PCRE=1
 encryption_key: Zs8dTG08K3BlA5TGKtKbjMOfHDd0wa92s+Y6RNDwtaE=
+docker_registry_mirrors:
+- { name: 'hub-mirror', mirror-url: "https://hub-mirror.c.163.com" }
+- { name: 'docker-mirror', mirror-url: "https://docker.mirrors.ustc.edu.cn" }

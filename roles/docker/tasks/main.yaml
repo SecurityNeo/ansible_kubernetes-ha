@@ -18,11 +18,12 @@
     src={{ local_package_dir }}/docker/
     dest={{ package_dir }}/bin/
     owner={{ k8s_user }}
+    mode=0755
 
 - name: Distribute docker service file
   template:
     src=templates/docker.service.j2
-    dest=/etc/systemd/system/ocker.service
+    dest=/etc/systemd/system/docker.service
 
 - name: Distribute docker-daemon config file
   template:

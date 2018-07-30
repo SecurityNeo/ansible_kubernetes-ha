@@ -1,6 +1,12 @@
+- name: Distribute binary file
+  copy:
+    src={{ local_package_dir }}/kubernetes/server/bin/
+    dest={{ package_dir }}/bin/
+    owner={{ k8s_user }}
+
 - name: Create token
   shell:
-    kubeadm token create --description kubelet-bootstrap-token --groups system:bootstrappers:{{ node_name }} --kubeconfig {{ local_template_dir }}kubectl.kubeconfig > {{ node_name }}.token
+    kubeadm token create --description kubelet-bootstrap-token --groups system:bootstrappers:{{ node_name }} --kubeconfig {{ local_template_dir }}/kubectl.kubeconfig > {{ node_name }}.token
   connection: local
   ignore_errors: yes
 
@@ -56,8 +62,11 @@
     state=started
     enabled=yes
 
-- name: Distribute csr-crb.yaml to master_vip
+- name: Copy csr-crb file
+  copy:
+    src=templates/csr-crb.yaml.template
+    dest={{ package_dir }}/csr-crb.yaml
+
+- name: Apply csr-crb
   shell:
-    scp templates/csr-crb.yaml.template root@{{ master_vip }}:{{ package_dir }}/sr-crb.yaml && kubectl apply -f {{ package_dir }}/csr-crb.yaml
-  connection: local
-  ignore_errors: yes
+    kubectl apply -f {{ package_dir }}/csr-crb.yaml

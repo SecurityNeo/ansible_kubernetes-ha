@@ -71,5 +71,9 @@
 - name: Grant authorization for kubernetes
   shell:
     kubectl create clusterrolebinding kube-apiserver:kubelet-apis --clusterrole=system:kubelet-api-admin --user kubernetes
-
+  register: result
+  until: result.stdout.find("created") != -1
+  retries: 5
+  delay: 5
+  ignore_errors: yes
 
