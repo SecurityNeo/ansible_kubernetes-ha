@@ -1,3 +1,8 @@
+- name: Create kube-proxy lib dir
+  file:
+    path=/var/lib/kube-proxy
+    state=directory
+
 - name:  Copy kube-proxy csr file
   copy:
     src=templates/kube-proxy-csr.json.template

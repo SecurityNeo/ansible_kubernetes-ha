@@ -1,3 +1,8 @@
+- name: Create kubelet lib dir
+  file:
+    path=/var/lib/kubelet
+    state=directory
+
 - name: Distribute binary file
   copy:
     src={{ local_package_dir }}/kubernetes/server/bin/

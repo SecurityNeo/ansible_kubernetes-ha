@@ -5,4 +5,4 @@ master3 ansible_ssh_host=172.25.144.87 ansible_ssh_port=22 ansible_ssh_user=root
 [worker]
 worker1 ansible_ssh_host=172.25.144.81 ansible_ssh_port=22 ansible_ssh_user=root node_name=worker01
 worker2 ansible_ssh_host=172.25.144.82 ansible_ssh_port=22 ansible_ssh_user=root node_name=worker02
-worker3 ansible_ssh_host=172.25.144.83 ansible_ssh_port=22 ansible_ssh_user=root node_name=worker02
+worker3 ansible_ssh_host=172.25.144.83 ansible_ssh_port=22 ansible_ssh_user=root node_name=worker03
