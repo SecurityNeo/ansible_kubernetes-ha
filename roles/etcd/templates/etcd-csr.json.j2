@@ -4,9 +4,9 @@
     "127.0.0.1",
     {% for etcd_ip in master_servers %}
       {% if loop.last %}
-	    "{{ etcd_ip}}"
+	    "{{ etcd_ip.ip}}"
 	  {% else %}
-	    "{{ etcd_ip}}",
+	    "{{ etcd_ip.ip}}",
 	  {% endif %}
     {% endfor %}
   ],

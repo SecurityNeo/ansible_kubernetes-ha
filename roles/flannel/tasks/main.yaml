@@ -1,8 +1,9 @@
 - name: Copy flannel release packages to local_package_dir
   copy:
-    src=files/flannel-v{{ flannel_version }}}-linux-amd64.tar.gz
+    src=files/flannel-v{{ flannel_version }}-linux-amd64.tar.gz
     dest={{ local_package_dir }}/flannel/
   connection: local
+  run_once: yes
   ignore_errors: yes
   
 - name: Unarchived flannel  file
@@ -11,6 +12,7 @@
     dest={{ local_package_dir }}/flannel/
     copy=no
   connection: local
+  run_once: yes
   ignore_errors: yes
   
 - name: Distribute flanneld 
@@ -32,12 +34,14 @@
     src=templates/flanneld-csr.json.template
     dest={{ local_template_dir }}/flanneld-csr.json
   connection: local
+  run_once: yes
   ignore_errors: yes
   
 - name: Generate flanneld certificate and key file
   shell:
     cd {{ local_template_dir }}/ && cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes flanneld-csr.json | cfssljson -bare flanneld
   connection: local
+  run_once: yes
   ignore_errors: yes
   
 - name: Distribute flanneld certificate files
@@ -57,6 +61,7 @@
     src=templates/flanneld.service.j2
     dest={{ local_template_dir }}/flanneld.service
   connection: local
+  run_once: yes
 
 - name: Distribute flanneld service file
   copy:
@@ -71,9 +76,9 @@
 
 - name: Write networrk information to etcd cluster
   shell:
-    ssh root@{{ master_vip }} "sh {{ package_dir }}/update-flanneld.sh"
-  connection: local
-  ignore_errors: yes
+    sh {{ package_dir }}/update-flanneld.sh
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: yes
 
 - name: Start flanneld service
   service:

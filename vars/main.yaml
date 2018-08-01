@@ -38,7 +38,7 @@ master_servers:
 - { name: 'k8s-api-3', ip: "172.25.144.87", port: "6443", node_name: "master03" }
 
 
-haproxy_bind_port: 443
+haproxy_bind_port: 8443
 bind_interface: eth0
 service_cidr: 10.254.0.0/16
 cluster_cidr: 172.30.0.0/16
@@ -54,5 +54,5 @@ cluster_dns_domain: cluster.local.
 haproxy_make_option: TARGET=linux2628 CPU=x86_64 USE_OPENSSL=1 USE_ZLIB=1 USE_PCRE=1
 encryption_key: Zs8dTG08K3BlA5TGKtKbjMOfHDd0wa92s+Y6RNDwtaE=
 docker_registry_mirrors:
-- { name: 'hub-mirror', mirror-url: "https://hub-mirror.c.163.com" }
-- { name: 'docker-mirror', mirror-url: "https://docker.mirrors.ustc.edu.cn" }
+- { name: "hub-mirror", mirror-url: "https://hub-mirror.c.163.com" }
+- { name: "docker-mirror", mirror-url: "https://docker.mirrors.ustc.edu.cn" }

@@ -8,36 +8,42 @@
     src=templates/kube-proxy-csr.json.template
     dest={{ local_template_dir }}/kube-proxy-csr.json
   connection: local
+  run_onec: yes
   ignore_errors: yes
 
 - name: Generate kube-proxy certificate and key file
   shell:
     cd {{ local_template_dir }}/ && cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes  kube-proxy-csr.json | cfssljson -bare kube-proxy
   connection: local
+  run_once: yes
   ignore_errors: yes
 
 - name: Configure k8s cluster parameter
   shell:
     cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config set-cluster kubernetes --certificate-authority=ca.pem --embed-certs=true --server={{ kube_apiserver }} --kubeconfig=kube-proxy.kubeconfig
   connection: local
+  run_once: yes
   ignore_errors: yes
 
 - name: Configure k8s client certificate parameter
   shell:
     cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config set-credentials kube-proxy --client-certificate=kube-proxy.pem --client-key=kube-proxy-key.pem --embed-certs=true --kubeconfig=kube-proxy.kubeconfig
   connection: local
+  run_once: yes
   ignore_errors: yes
 
 - name: Configure context parameter
   shell:
     cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config set-context default --cluster=kubernetes --user=kube-proxy --kubeconfig=kube-proxy.kubeconfig
   connection: local
+  run_once: yes
   ignore_errors: yes
 
 - name: Configure use-context
   shell:
     cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
   connection: local
+  run_once: yes
   ignore_errors: yes
 
 - name: Distribute kube-proxy file to user

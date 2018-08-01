@@ -3,12 +3,14 @@
     src=templates/kube-controller-manager-csr.json.j2
     dest={{ local_template_dir }}/kube-controller-manager-csr.json
   connection: local
+  run_once: yes
   ignore_errors: yes
 
 - name: Generate kube-controller-manager certificate and key file
   shell:
     cd {{ local_template_dir }}/ && cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-controller-manager-csr.json | cfssljson -bare kube-controller-manager
   connection: local
+  run_once: yes
   ignore_errors: yes
 
 - name:  Distribute kube-controller-manager certificate files
@@ -27,24 +29,28 @@
   shell:
     cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config set-cluster kubernetes --certificate-authority=ca.pem --embed-certs=true --server={{ kube_apiserver }} --kubeconfig=kube-controller-manager.kubeconfig
   connection: local
+  run_once: yes
   ignore_errors: yes
 
 - name: Configure k8s client certificate parameter
   shell:
     cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config set-credentials system:kube-controller-manager --client-certificate=kube-controller-manager.pem --client-key=kube-controller-manager-key.pem --embed-certs=true --kubeconfig=kube-controller-manager.kubeconfig
   connection: local
+  run_once: yes
   ignore_errors: yes
 
 - name: Configure context parameter
   shell:
     cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config set-context system:kube-controller-manager --cluster=kubernetes --user=system:kube-controller-manager --kubeconfig=kube-controller-manager.kubeconfig
   connection: local
+  run_once: yes
   ignore_errors: yes
 
 - name: Configure use-context
   shell:
     cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config use-context system:kube-controller-manager --kubeconfig=kube-controller-manager.kubeconfig
   connection: local
+  run_once: yes
   ignore_errors: yes
 
 - name: Distribute kube-controller-manager.kubeconfig file to user

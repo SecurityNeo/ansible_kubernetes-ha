@@ -3,6 +3,7 @@
     src=files/docker-{{ docker_version }}-ce.tgz
     dest={{ local_package_dir }}/
   connection: local
+  run_once: yes
   ignore_errors: yes
 
 - name: Unarchived kubernetes file
@@ -11,6 +12,7 @@
     dest={{ local_package_dir }}/
     copy=no
   connection: local
+  run_once: yes
   ignore_errors: yes
 
 - name: Distribute binary file
@@ -29,6 +31,10 @@
   template:
     src=templates/docker-daemon.json.j2
     dest={{ docker_conf_dir }}/daemon.json
+
+- name: Before starting docker
+  shell:
+    systemctl daemon-reload
 
 - name: Start docker service
   service:

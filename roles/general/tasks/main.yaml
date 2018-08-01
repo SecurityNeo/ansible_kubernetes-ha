@@ -31,31 +31,25 @@
   file:
     path={{ kubernetes_cert_dir }}
     state=directory
-    owenr={{ k8s_user }}
+    owner={{ k8s_user }}
 
 - name: Create etcd cert dir
   file:
     path={{ etcd_cert_dir }}
     state=directory
-    owenr={{ k8s_user }}
+    owner={{ k8s_user }}
 
 - name: Create etcd lib dir
   file:
     path=/var/lib/etcd
     state=directory
-    owenr={{ k8s_user }}
-
-- name: Create etcd lib dir
-  file:
-    path=/var/lib/etcd
-    state=directory
-    owenr={{ k8s_user }}
+    owner={{ k8s_user }}
 
 - name: Create kube config dir
   file:
     path={{ k8s_home_kube }}
     state=directory
-    owenr={{ k8s_user }}
+    owner={{ k8s_user }}
 
 - name: Create kube config dir
   file:
@@ -66,7 +60,7 @@
   file:
     path={{ kubernetes_log_dir }}
     state=directory
-    owenr={{ k8s_user }}
+    owner={{ k8s_user }}
 
 - name: Create local templates dir
   file:
@@ -79,13 +73,13 @@
   file:
     path={{ kubernetes_conf_dir }}
     state=directory
-    owenr={{ k8s_user }}
+    owner={{ k8s_user }}
 
 - name: Create flannel cert dir
   file:
     path={{ flanneld_cert_dir }}
     state=directory
-    owenr={{ k8s_user }}
+    owner={{ k8s_user }}
 
 - name: Add environment variables
   shell:

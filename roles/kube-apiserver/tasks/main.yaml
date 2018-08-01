@@ -3,6 +3,7 @@
     src=files/kubernetes-server-linux-amd64.tar.gz
     dest={{ local_package_dir }}/
   connection: local
+  run_once: yes
   ignore_errors: yes
 
 - name: Unarchived kubernetes file
@@ -11,6 +12,7 @@
     dest={{ local_package_dir }}/
     copy=no
   connection: local
+  run_once: yes
   ignore_errors: yes
 
 - name: Unarchived kubernetes src file
@@ -19,6 +21,7 @@
     dest={{ local_package_dir }}/kubernetes/
     copy=no
   connection: local
+  run_once: yes
   ignore_errors: yes
 
 - name: Distribute binary file
@@ -26,18 +29,21 @@
     src={{ local_package_dir }}/kubernetes/server/bin/
     dest={{ package_dir }}/bin/
     owner={{ k8s_user }}
+    mode=0755
 
 - name:  Copy kubernetes csr file
-  copy:
-    src=templates/kubernetes-csr.json.template
+  template:
+    src=templates/kubernetes-csr.json.j2
     dest={{ local_template_dir }}/kubernetes-csr.json
   connection: local
+  run_once: yes
   ignore_errors: yes
 
 - name: Generate kubernetes certificate and key file
   shell:
     cd {{ local_template_dir }}/ && cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kubernetes-csr.json | cfssljson -bare kubernetes
   connection: local
+  run_once: yes
   ignore_errors: yes
 
 - name: Distribute kubernetes certificate files
@@ -75,5 +81,7 @@
   until: result.stdout.find("created") != -1
   retries: 5
   delay: 5
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: yes
   ignore_errors: yes
 

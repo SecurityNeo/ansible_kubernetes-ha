@@ -8,10 +8,11 @@
     src={{ local_package_dir }}/kubernetes/server/bin/
     dest={{ package_dir }}/bin/
     owner={{ k8s_user }}
+    mode=0755
 
 - name: Create token
   shell:
-    kubeadm token create --description kubelet-bootstrap-token --groups system:bootstrappers:{{ node_name }} --kubeconfig {{ local_template_dir }}/kubectl.kubeconfig > {{ node_name }}.token
+    cd { local_template_dir }} && {{ local_package_dir }}/kubernetes/server/bin/kubeadm token create --description kubelet-bootstrap-token --groups system:bootstrappers:{{ node_name }} --kubeconfig {{ local_template_dir }}/kubectl.kubeconfig > {{ node_name }}.token
   connection: local
   ignore_errors: yes
 
@@ -57,8 +58,8 @@
 
 - name: Create clusterrole binding
   shell:
-    ssh root@{{ master_vip }}"kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --group=system:bootstrappers"
-  connection: local
+    kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --group=system:bootstrappers
+  run_once: yes
   ignore_errors: yes
 
 - name: Start kubelet service
@@ -75,3 +76,5 @@
 - name: Apply csr-crb
   shell:
     kubectl apply -f {{ package_dir }}/csr-crb.yaml
+  run_once: yes
+  ignore_errors: yes
