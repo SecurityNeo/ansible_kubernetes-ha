@@ -41,3 +41,18 @@
     name=docker
     state=started
     enabled=yes
+
+- name: Coapy python rhsm rpm packages
+  copy:
+    src=files/python-rhsm-{{ python_rhsm_version }}-1.el7.x86_64.rpm
+    dest={{ package_dir }}/
+
+- name: Coapy python rhsm rpm packages
+  copy:
+    src=files/python-rhsm-certificates-{{ python_rhsm_version }}-1.el7.x86_64.rpm
+    dest={{ package_dir }}/
+
+- name: Install python rhsm
+  shell:
+    rpm -ivh {{ package_dir }}/python-rhsm-{{ python_rhsm_version }}-1.el7.x86_64.rpm && rpm -ivh {{ package_dir }}/python-rhsm-certificates-{{ python_rhsm_version }}-1.el7.x86_64.rpm
+
