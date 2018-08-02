@@ -10,35 +10,19 @@
     owner={{ k8s_user }}
     mode=0755
 
-- name: Create token
-  shell:
-    cd { local_template_dir }} && {{ local_package_dir }}/kubernetes/server/bin/kubeadm token create --description kubelet-bootstrap-token --groups system:bootstrappers:{{ node_name }} --kubeconfig {{ local_template_dir }}/kubectl.kubeconfig > {{ node_name }}.token
+- name: Copy gen_kubelet_bootstrap.sh
+  template:
+    src=templates/gen_kubelet_bootstrap.sh.j2
+    dest={{ local_template_dir }}/gen_kubelet_bootstrap.sh
+    mode=0755
   connection: local
-  ignore_errors: yes
+  run_once: yes
 
-- name: Configure k8s cluster parameter
+- name: Generate kubelet bootstrap file
   shell:
-    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config set-cluster kubernetes --certificate-authority=ca.pem --embed-certs=true --server={{ kube_apiserver }} --kubeconfig=kubelet-bootstrap-{{ node_name }}.kubeconfig
+    sh {{ local_template_dir }}/gen_kubelet_bootstrap.sh
   connection: local
-  ignore_errors: yes
-
-- name: Configure k8s client certificate parameter
-  shell:
-    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config set-credentials kubelet-bootstrap --token=`cat {{ node_name }}.token` --kubeconfig=kubelet-bootstrap-{{ node_name }}.kubeconfig
-  connection: local
-  ignore_errors: yes
-
-- name: Configure context parameter
-  shell:
-    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config set-context default --cluster=kubernetes --user=kubelet-bootstrap --kubeconfig=kubelet-bootstrap-{{ node_name }}.kubeconfig
-  connection: local
-  ignore_errors: yes
-
-- name: Configure use-context
-  shell:
-    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config use-context default --kubeconfig=kubelet-bootstrap-{{ node_name }}.kubeconfig
-  connection: local
-  ignore_errors: yes
+  run_once: yes
 
 - name: Distribute kubelet file to user k8s
   copy:

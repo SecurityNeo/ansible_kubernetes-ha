@@ -37,6 +37,10 @@ master_servers:
 - { name: 'k8s-api-2', ip: "172.25.144.86", port: "6443", node_name: "master02" }
 - { name: 'k8s-api-3', ip: "172.25.144.87", port: "6443", node_name: "master03" }
 
+worker_servers:
+- { ip: "172.25.144.81", node_name: "worker01" }
+- { ip: "172.25.144.82", node_name: "worker02" }
+- { ip: "172.25.144.83", node_name: "worker03" }
 
 haproxy_bind_port: 8443
 bind_interface: eth0
