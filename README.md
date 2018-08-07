@@ -62,3 +62,10 @@ encryption_key|Bootstrap 加密key
 docker_registry_mirrors|Docker镜像仓库地址
 master_servers|主节点信息
 worker_servers|工作节点信息
+
+## 使用前提
+被控节点需正确配置yum源，能通过yum安装gcc等工具
+控制节点能免密连接被控节点
+
+## 使用方法
+ansible-playbook main.yaml -i ansible-hosts
