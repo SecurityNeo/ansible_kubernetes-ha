@@ -53,12 +53,12 @@ master_vip|集群虚IP地址
 kube_apiserver|kubernetes API服务器URL
 etcd_endpoints|ETCD endpoints URL
 etcd_nodes|ETCD节点
-flannel_etcd_prefix|
-cluster_kubernetes_svc_ip|
-cluster_dns_svc_ip|
-cluster_dns_domain|
-haproxy_make_option|
-encryption_key|
-docker_registry_mirrors|
-master_servers|
-worker_servers|
+flannel_etcd_prefix|flannel在ETCD中的存放路径
+cluster_kubernetes_svc_ip|kubernetes service IP
+cluster_dns_svc_ip|kubernetes集群DNS service IP
+cluster_dns_domain|kubernetes集群DNS 域名
+haproxy_make_option|haproxy 编译选项
+encryption_key|Bootstrap 加密key
+docker_registry_mirrors|Docker镜像仓库地址
+master_servers|主节点信息
+worker_servers|工作节点信息
