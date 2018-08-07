@@ -1,0 +1,105 @@
+- name: Copy kubernetes-client file to local_package_dir
+  copy:
+    src=files/kubernetes-client-linux-amd64.tar.gz
+    dest={{ local_package_dir }}/kubectl/
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+  
+- name: Unarchived kubernetes-client file
+  unarchive:
+    src={{ local_package_dir }}/kubectl/kubernetes-client-linux-amd64.tar.gz
+    dest={{ local_package_dir }}/kubectl/
+    copy=no
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+  
+- name: Make sure kubectl is excuteable
+  file:
+    path={{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl
+    mode=0755
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+    
+- name: Distribute kubectl
+  copy: 
+    src={{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl
+    dest={{ package_dir }}/bin/
+    mode=0755
+    owner={{ k8s_user }}
+    
+- name: Copy admin-csr to local_template_dir
+  copy:
+    src=templates/admin-csr.json.template
+    dest={{ local_template_dir }}/admin-csr.json
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+    
+- name: Generate admin certificate and private key
+  shell:
+    cd {{ local_template_dir }} && cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes admin-csr.json | cfssljson -bare admin
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+  
+- name: Configure k8s cluster parameter
+  shell:
+    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config set-cluster kubernetes --certificate-authority=ca.pem --embed-certs=true --server={{ kube_apiserver }} --kubeconfig=kubectl.kubeconfig
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+
+- name: Configure k8s client certificate parameter
+  shell:
+    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config set-credentials admin --client-certificate=admin.pem --client-key=admin-key.pem --embed-certs=true --kubeconfig=kubectl.kubeconfig
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+
+- name: Configure context parameter
+  shell:
+    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config set-context kubernetes --cluster=kubernetes --user=admin --kubeconfig=kubectl.kubeconfig
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+
+- name: Configure use-context
+  shell:
+    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config use-context kubernetes --kubeconfig=kubectl.kubeconfig
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+
+- name: Distribute kubeconfig file to user k8s
+  copy:
+    src={{ local_template_dir }}/kubectl.kubeconfig
+    dest={{k8s_home_kube}}/config
+    owner={{ k8s_user }}
+
+- name: Distribute kubeconfig file to user root
+  copy:
+    src={{ local_template_dir }}/kubectl.kubeconfig
+    dest={{root_home_kube}}/config
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+
+
+
+    

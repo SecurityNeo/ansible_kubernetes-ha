@@ -1,0 +1,26 @@
+{
+    "CN": "system:kube-scheduler",
+    "hosts": [
+      "127.0.0.1",
+      {% for ip in master_servers %}
+      {% if loop.last %}
+	  "{{ ip.ip }}"
+	  {% else %}
+	  "{{ ip.ip}}",
+	  {% endif %}
+      {% endfor %}
+    ],
+    "key": {
+        "algo": "rsa",
+        "size": 2048
+    },
+    "names": [
+      {
+        "C": "CN",
+        "ST": "ChengDu",
+        "L": "ChengDu",
+        "O": "system:kube-scheduler",
+        "OU": "4Paradigm"
+      }
+    ]
+}

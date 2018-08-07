@@ -1,0 +1,43 @@
+- hosts: all
+  vars_files:
+    - vars/main.yaml
+  roles:
+    - general
+    - cfssl
+    - kubectl
+
+- hosts: master
+  vars_files:
+    - vars/main.yaml
+  roles:
+    - haproxy
+    - keepalived
+    - etcd
+
+- hosts: all
+  vars_files:
+    - vars/main.yaml
+  roles:
+    - flannel
+
+- hosts: master
+  vars_files:
+    - vars/main.yaml
+  roles:
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+
+- hosts: worker
+  vars_files:
+    - vars/main.yaml
+  roles:
+    - docker
+    - kubelet
+    - kube-proxy
+
+- hosts: all
+  vars_files:
+    - vars/main.yaml
+  roles:
+    - clean

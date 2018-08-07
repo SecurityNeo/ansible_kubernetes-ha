@@ -1,0 +1,10 @@
+#!/bin/bash
+
+{% for node in worker_servers %}
+cd {{ local_template_dir }} && export {{ node.node_name }}token=$({{ local_package_dir }}/kubernetes/server/bin/kubeadm token create --description kubelet-bootstrap-token --groups system:bootstrappers:{{ node.node_name }} --kubeconfig {{ local_template_dir }}/kubectl.kubeconfig)
+cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config set-cluster kubernetes --certificate-authority=ca.pem --embed-certs=true --server={{ kube_apiserver }} --kubeconfig=kubelet-bootstrap-{{ node.node_name }}.kubeconfig
+cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config set-credentials kubelet-bootstrap --token=${{ node.node_name }}token --kubeconfig=kubelet-bootstrap-{{ node.node_name }}.kubeconfig
+cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config set-context default --cluster=kubernetes --user=kubelet-bootstrap --kubeconfig=kubelet-bootstrap-{{ node.node_name }}.kubeconfig
+cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config use-context default --kubeconfig=kubelet-bootstrap-{{ node.node_name }}.kubeconfig
+
+{% endfor %}

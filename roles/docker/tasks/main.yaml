@@ -1,0 +1,67 @@
+- name: Copy docker release packages to local_package_dir
+  copy:
+    src=files/docker-{{ docker_version }}-ce.tgz
+    dest={{ local_package_dir }}/
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+
+- name: Unarchived kubernetes file
+  unarchive:
+    src={{ local_package_dir }}/docker-{{ docker_version }}-ce.tgz
+    dest={{ local_package_dir }}/
+    copy=no
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+
+- name: Distribute binary file
+  copy:
+    src={{ local_package_dir }}/docker/
+    dest={{ package_dir }}/bin/
+    owner={{ k8s_user }}
+    mode=0755
+
+- name: Distribute docker service file
+  template:
+    src=templates/docker.service.j2
+    dest=/etc/systemd/system/docker.service
+
+- name: Distribute docker-daemon config file
+  template:
+    src=templates/docker-daemon.json.j2
+    dest={{ docker_conf_dir }}/daemon.json
+
+- name: Before starting docker
+  shell:
+    systemctl daemon-reload
+
+- name: Start docker service
+  service:
+    name=docker
+    state=started
+    enabled=yes
+
+- name: Coapy python rhsm rpm packages
+  copy:
+    src=files/python-rhsm-{{ python_rhsm_version }}-1.el7.x86_64.rpm
+    dest={{ package_dir }}/
+
+- name: Coapy python rhsm rpm packages
+  copy:
+    src=files/python-rhsm-certificates-{{ python_rhsm_version }}-1.el7.x86_64.rpm
+    dest={{ package_dir }}/
+
+- name: Copy python-dateutil file
+  copy:
+    src=files/python-dateutil-1.5-7.el7.noarch.rpm
+    dest={{ package_dir }}
+
+- name: Install python rhsm
+  shell:
+    cd {{ package_dir }} && rpm -ivh *.rpm
+
+- name: Delete rhsm rpm pachages
+  shell:
+    rm -rf {{ package_dir }}/*.rpm
+

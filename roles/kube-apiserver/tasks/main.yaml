@@ -1,0 +1,87 @@
+- name: Copy kubernetes master release packages to local_package_dir
+  copy:
+    src=files/kubernetes-server-linux-amd64.tar.gz
+    dest={{ local_package_dir }}/
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+
+- name: Unarchived kubernetes file
+  unarchive:
+    src={{ local_package_dir }}/kubernetes-server-linux-amd64.tar.gz
+    dest={{ local_package_dir }}/
+    copy=no
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+
+- name: Unarchived kubernetes src file
+  unarchive:
+    src={{ local_package_dir }}/kubernetes/kubernetes-src.tar.gz
+    dest={{ local_package_dir }}/kubernetes/
+    copy=no
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+
+- name: Distribute binary file
+  copy:
+    src={{ local_package_dir }}/kubernetes/server/bin/
+    dest={{ package_dir }}/bin/
+    owner={{ k8s_user }}
+    mode=0755
+
+- name:  Copy kubernetes csr file
+  template:
+    src=templates/kubernetes-csr.json.j2
+    dest={{ local_template_dir }}/kubernetes-csr.json
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+
+- name: Generate kubernetes certificate and key file
+  shell:
+    cd {{ local_template_dir }}/ && cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kubernetes-csr.json | cfssljson -bare kubernetes
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+
+- name: Distribute kubernetes certificate files
+  copy:
+    src={{ local_template_dir }}/kubernetes.pem
+    dest={{ kubernetes_cert_dir }}/
+    owner={{ k8s_user }}
+
+- name: Distribute kubernetes certificate files
+  copy:
+    src={{ local_template_dir }}/kubernetes-key.pem
+    dest={{ kubernetes_cert_dir }}/
+    owner={{ k8s_user }}
+
+- name: Distribute kubernetes encryption config file
+  template:
+    src=templates/encryption-config.yaml.j2
+    dest={{ kubernetes_conf_dir }}/encryption-config.yaml
+
+- name: Distribute kubernetes service file
+  template:
+    src=templates/kube-apiserver.service.j2
+    dest=/etc/systemd/system/kube-apiserver.service
+
+- name: Start kube-apiserver service
+  service:
+    name=kube-apiserver
+    state=started
+    enabled=yes
+
+- name: Grant authorization for kubernetes
+  shell:
+    kubectl create clusterrolebinding kube-apiserver:kubelet-apis --clusterrole=system:kubelet-api-admin --user kubernetes
+  register: result
+  until: result.stdout.find("created") != -1
+  retries: 5
+  delay: 5
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: yes
+  ignore_errors: yes
+

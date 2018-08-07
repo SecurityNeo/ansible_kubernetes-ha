@@ -1,0 +1,59 @@
+- name: Copy kube-scheduler csr file
+  template:
+    src=templates/kube-scheduler-csr.json.j2
+    dest={{ local_template_dir }}/kube-scheduler-csr.json
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+
+- name: Generate kube-scheduler certificate and key file
+  shell:
+    cd {{ local_template_dir }}/ && cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-scheduler-csr.json | cfssljson -bare kube-scheduler
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+
+- name: Configure k8s cluster parameter
+  shell:
+    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config set-cluster kubernetes --certificate-authority=ca.pem --embed-certs=true --server={{ kube_apiserver }} --kubeconfig=kube-scheduler.kubeconfig
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+
+- name: Configure k8s client certificate parameter
+  shell:
+    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config set-credentials system:kube-scheduler --client-certificate=kube-scheduler.pem --client-key=kube-scheduler-key.pem --embed-certs=true --kubeconfig=kube-scheduler.kubeconfig
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+
+- name: Configure context parameter
+  shell:
+    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config set-context system:kube-scheduler --cluster=kubernetes --user=system:kube-scheduler --kubeconfig=kube-scheduler.kubeconfig
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+
+- name: Configure use-context
+  shell:
+    cd {{ local_template_dir }} && {{ local_package_dir }}/kubectl/kubernetes/client/bin/kubectl config use-context system:kube-scheduler --kubeconfig=kube-scheduler.kubeconfig
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+
+- name: Distribute kube-scheduler.kubeconfig file to user
+  copy:
+    src={{ local_template_dir }}/kube-scheduler.kubeconfig
+    dest={{ kubernetes_conf_dir }}/
+    owner={{ k8s_user }}
+
+- name: Distribute kube-scheduler service file
+  template:
+    src=templates/kube-scheduler.service.j2
+    dest=/etc/systemd/system/kube-scheduler.service
+
+- name: Start kube-scheduler service
+  service:
+    name=kube-scheduler
+    state=started
+    enabled=yes

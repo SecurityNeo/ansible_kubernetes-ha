@@ -1,0 +1,26 @@
+{
+  "CN": "etcd",
+  "hosts": [
+    "127.0.0.1",
+    {% for etcd_ip in master_servers %}
+      {% if loop.last %}
+	    "{{ etcd_ip.ip}}"
+	  {% else %}
+	    "{{ etcd_ip.ip}}",
+	  {% endif %}
+    {% endfor %}
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "CN",
+      "ST": "ChengDu",
+      "L": "ChengDu",
+      "O": "k8s",
+      "OU": "4Paradigm"
+    }
+  ]
+}

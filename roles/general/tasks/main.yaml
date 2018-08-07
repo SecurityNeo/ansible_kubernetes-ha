@@ -1,0 +1,178 @@
+- name: Stop selinux
+  selinux:
+    state: disabled
+
+- name: Add group docker
+  group:
+    name={{ docker_group }}
+
+- name: Add user k8s
+  user:
+    name={{ k8s_user }}
+    group={{ docker_group }}
+
+- name: Create docker config directory
+  file:
+    path={{ docker_conf_dir }}
+    state=directory
+
+- name: Create package directory
+  file:
+    path={{ package_dir }}/bin/
+    state=directory
+    owenr={{ k8s_user }}
+
+- name: Change package_dir's owenr
+  file:
+    path={{ package_dir }}
+    owner={{ k8s_user }}
+
+- name: Create kubernetes cert dir
+  file:
+    path={{ kubernetes_cert_dir }}
+    state=directory
+    owner={{ k8s_user }}
+
+- name: Create etcd cert dir
+  file:
+    path={{ etcd_cert_dir }}
+    state=directory
+    owner={{ k8s_user }}
+
+- name: Create etcd lib dir
+  file:
+    path=/var/lib/etcd
+    state=directory
+    owner={{ k8s_user }}
+
+- name: Create kube config dir
+  file:
+    path={{ k8s_home_kube }}
+    state=directory
+    owner={{ k8s_user }}
+
+- name: Create kube config dir
+  file:
+    path={{ root_home_kube }}
+    state=directory
+
+- name: Create kubernetes logs dir
+  file:
+    path={{ kubernetes_log_dir }}
+    state=directory
+    owner={{ k8s_user }}
+
+- name: Create local templates dir
+  file:
+    path={{ local_template_dir }}
+    state=directory
+  connection: local
+  ignore_errors: yes
+
+- name: Create kubernetes config dir
+  file:
+    path={{ kubernetes_conf_dir }}
+    state=directory
+    owner={{ k8s_user }}
+
+- name: Create flannel cert dir
+  file:
+    path={{ flanneld_cert_dir }}
+    state=directory
+    owner={{ k8s_user }}
+
+- name: Add environment variables
+  shell:
+    echo 'PATH={{ package_dir }}/bin:$PATH:$HOME/bin:$JAVA_HOME/bin' >>/root/.bashrc &&  echo 'PATH={{ package_dir }}/bin:$PATH:$HOME/bin:$JAVA_HOME/bin' >>/home/{{ k8s_user }}/.bashrc
+
+- name: Stop Firewalld
+  shell:
+    systemctl disable firewalld  && systemctl stop firewalld
+
+- name: Config iptables
+  shell:
+    iptables -F && sudo iptables -X && sudo iptables -F -t nat && sudo iptables -X -t nat && iptables -P FORWARD ACCEPT
+
+- name: Stop swap
+  shell:
+    swapoff -a && sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+- name: Stop dnsmasq
+  shell:
+    service dnsmasq stop && systemctl disable dnsmasq
+
+- name: Modify kernel parameter
+  sysctl:
+    name=net.ipv4.ip_nonlocal_bind
+    value=1
+    state=present
+    ignoreerrors=yes
+
+- name: Modify kernel parameter
+  sysctl:
+    name=net.ipv4.ip_forward
+    value=1
+    state=present
+    ignoreerrors=yes
+
+- name: Modify kernel parameter
+  sysctl:
+    name=net.bridge.bridge-nf-call-iptables
+    value=1
+    state=present
+    ignoreerrors=yes
+
+- name: Modify kernel parameter
+  sysctl:
+    name=net.bridge.bridge-nf-call-ip6tables
+    value=1
+    state=present
+    ignoreerrors=yes
+
+- name: Modify kernel parameter
+  sysctl:
+    name=vm.swappiness
+    value=0
+    state=present
+    ignoreerrors=yes
+
+- name: Modify kernel parameter
+  sysctl:
+    name=vm.overcommit_memory
+    value=1
+    state=present
+    ignoreerrors=yes
+
+- name: Modify kernel parameter
+  sysctl:
+    name=vm.panic_on_oom
+    value=0
+    state=present
+    ignoreerrors=yes
+
+- name: Setting up the system time zone
+  shell:
+    timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0 && systemctl restart rsyslog && systemctl restart crond
+
+
+- name: Install the dependencies
+  yum: name={{ item }} state=installed
+  with_items:
+    - openssl-devel
+    - pcre-devel
+    - make
+    - gcc
+    - socat
+    - epel-release
+    - conntrack
+    - ipvsadm
+    - ipset
+    - jq
+    - sysstat
+    - curl
+    - iptables
+  when: ansible_os_family == "RedHat"
+
+- name: Load kernel module
+  shell:
+    modprobe br_netfilter && modprobe ip_vs

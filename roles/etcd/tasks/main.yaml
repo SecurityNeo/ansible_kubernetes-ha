@@ -1,0 +1,88 @@
+- name: Copy ETCD release packages to local_package_dir
+  copy:
+    src=files/etcd-v{{ etcd_version }}-linux-amd64.tar.gz
+    dest={{ local_package_dir }}/etcd/
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+  
+- name: Unarchived ETCD  file
+  unarchive:
+    src={{ local_package_dir }}/etcd/etcd-v{{ etcd_version }}-linux-amd64.tar.gz
+    dest={{ local_package_dir }}/etcd/
+    copy=no
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+  
+- name: Distribute etcd 
+  copy:
+    src={{ local_package_dir }}/etcd/etcd-v{{ etcd_version }}-linux-amd64/etcd
+    dest={{ package_dir }}/bin/
+    mode=0755
+
+- name: Distribute etcdctl
+  copy:
+    src={{ local_package_dir }}/etcd/etcdctl
+    dest={{ package_dir }}/bin/
+    mode=0755
+
+- name: Copy ETCD csr file 
+  template: 
+    src=templates/etcd-csr.json.j2 
+    dest={{ local_template_dir }}/etcd-csr.json
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+    
+- name: Generate ETCD  certificate and key file
+  shell: 
+    cd {{ local_template_dir }}/ && cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes etcd-csr.json | cfssljson -bare etcd
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+  
+- name:  Distribute ETCD certificate files
+  copy:
+    src={{ local_template_dir }}/etcd.pem
+    dest={{ etcd_cert_dir }}/
+    owner={{ k8s_user }}
+    
+- name: Distribute ETCD certificate files
+  copy:
+    src={{ local_template_dir }}/etcd-key.pem
+    dest={{ etcd_cert_dir }}/
+    owner={{ k8s_user }}
+    
+- name: Copy ETCD service file to local_template_dir
+  template:
+    src=templates/etcd.service.j2
+    dest={{ local_template_dir }}/etcd.service
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+    
+- name: Copy genetcd-service script file
+  template:
+    src=templates/genetcd-service.sh.j2
+    dest={{ local_template_dir }}/genetcd-service.sh
+    mode=0755
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+
+- name: Distribute ETCD service file
+  shell:
+    sh {{ local_template_dir }}/genetcd-service.sh
+  connection: local
+  ignore_errors: yes
+
+- name: Start ETCD service
+  service:
+    name=etcd
+    state=started
+    enabled=yes
+
+    
+    
+    

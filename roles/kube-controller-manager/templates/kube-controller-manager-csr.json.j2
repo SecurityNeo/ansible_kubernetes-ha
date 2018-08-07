@@ -1,0 +1,25 @@
+{
+    "CN": "system:kube-controller-manager",
+    "key": {
+        "algo": "rsa",
+        "size": 2048
+    },
+    "hosts": [
+      "127.0.0.1",
+      {% for etcd_ip in master_servers %}
+      {% if loop.last %}
+	    "{{ etcd_ip}}"
+	  {% else %}
+	    "{{ etcd_ip}}",
+    {% endfor %}
+    ],
+    "names": [
+      {
+        "C": "CN",
+        "ST": "ChengDu",
+        "L": "ChengDu",
+        "O": "system:kube-controller-manager",
+        "OU": "4Paradigm"
+      }
+    ]
+}

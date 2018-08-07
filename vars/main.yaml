@@ -1,0 +1,64 @@
+package_dir: /opt/k8s
+k8s_home_kube: /home/k8s/.kube
+root_home_kube: /root/.kube
+local_package_dir: /opt/package
+local_template_dir: /opt/template
+kubernetes_log_dir: /var/log/kubernetes
+kubernetes_conf_dir: /etc/kubernetes
+kubernetes_cert_dir: /etc/kubernetes/cert
+flanneld_cert_dir: /etc/flanneld/cert
+etcd_cert_dir: /etc/etcd/cert
+etcd_lib_dir: /var/lib/etcd
+docker_conf_dir: /etc/docker
+keepalived_src_dir: /tmp/kube_deploy
+keepalived_prefix_dir: /opt/ha/keepalived
+keepalived_conf_dir: /etc/keepalived
+haproxy_src_dir: /tmp/kube_deploy
+haproxy_prefix_dir: /opt/ha/haproxy
+haproxy_conf_dir: /etc/haproxy
+
+flannel_version: 0.10.0
+docker_version: 18.03.1
+etcd_version: 3.3.7
+keepalived_version: 2.0.5
+haproxy_version: 1.8.12
+python_rhsm_version: 1.19.9
+pod_infrastructure: registry.access.redhat.com/rhel7/pod-infrastructure:latest
+
+
+haproxy_user: haproxy
+haproxy_group: haproxy
+haproxy_auth_name: admin
+haproxy_auth_pass: cloudos
+docker_group: docker
+k8s_user: k8s
+
+
+master_servers: 
+- { name: 'k8s-api-1', ip: "10.100.1.85", port: "6443", node_name: "master01" }
+- { name: 'k8s-api-2', ip: "10.100.1.86", port: "6443", node_name: "master02" }
+- { name: 'k8s-api-3', ip: "10.100.1.87", port: "6443", node_name: "master03" }
+
+worker_servers:
+- { ip: "10.100.1.81", node_name: "worker01" }
+- { ip: "10.100.1.82", node_name: "worker02" }
+- { ip: "10.100.1.83", node_name: "worker03" }
+
+haproxy_bind_port: 8443
+bind_interface: eth0
+service_cidr: 10.254.0.0/16
+cluster_cidr: 172.30.0.0/16
+node_port_range: 8400-9000
+master_vip: 10.100.1.88
+kube_apiserver: https://10.100.1.88:8443
+etcd_endpoints: https://10.100.1.85:2379,https://10.100.1.86:2379,https://10.100.1.87:2379
+etcd_nodes: master01=https://10.100.1.85:2380,master02=https://10.100.1.86:2380,master03=https://10.100.1.87:2380
+flannel_etcd_prefix: /kubernetes/network
+cluster_kubernetes_svc_ip: 10.254.0.1
+cluster_dns_svc_ip: 10.254.0.2
+cluster_dns_domain: cluster.local.
+haproxy_make_option: TARGET=linux2628 CPU=x86_64 USE_OPENSSL=1 USE_ZLIB=1 USE_PCRE=1
+encryption_key: Zs8dTG08K3BlA5TGKtKbjMOfHDd0wa92s+Y6RNDwtaE=
+docker_registry_mirrors:
+- { name: "hub-mirror", mirror-url: "https://hub-mirror.c.163.com" }
+- { name: "docker-mirror", mirror-url: "https://docker.mirrors.ustc.edu.cn" }

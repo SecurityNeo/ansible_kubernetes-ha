@@ -1,0 +1,2 @@
+#!/bin/bash
+etcdctl --endpoints={{ etcd_endpoints }} --ca-file={{ kubernetes_cert_dir }}/ca.pem --cert-file={{ flanneld_cert_dir }}/flanneld.pem --key-file={{ flanneld_cert_dir }}/flanneld-key.pem set {{ flannel_etcd_prefix }}/config '{"Network":"'{{ cluster_cidr }}'", "SubnetLen": 24, "Backend": {"Type": "vxlan"}}'

@@ -1,0 +1,88 @@
+- name: Copy flannel release packages to local_package_dir
+  copy:
+    src=files/flannel-v{{ flannel_version }}-linux-amd64.tar.gz
+    dest={{ local_package_dir }}/flannel/
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+  
+- name: Unarchived flannel  file
+  unarchive:
+    src={{ local_package_dir }}/flannel/flannel-v{{ flannel_version }}-linux-amd64.tar.gz
+    dest={{ local_package_dir }}/flannel/
+    copy=no
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+  
+- name: Distribute flanneld 
+  copy:
+    src={{ local_package_dir }}/flannel/flanneld
+    dest={{ package_dir }}/bin/
+    owner={{ k8s_user }}
+    mode=0755
+    
+- name: Distribute mk-docker-opts.sh
+  copy:
+    src={{ local_package_dir }}/flannel/mk-docker-opts.sh
+    dest={{ package_dir }}/bin/
+    owner={{ k8s_user }}
+    mode=0755
+
+- name: Copy flanneld csr file
+  copy:
+    src=templates/flanneld-csr.json.template
+    dest={{ local_template_dir }}/flanneld-csr.json
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+  
+- name: Generate flanneld certificate and key file
+  shell:
+    cd {{ local_template_dir }}/ && cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes flanneld-csr.json | cfssljson -bare flanneld
+  connection: local
+  run_once: yes
+  ignore_errors: yes
+  
+- name: Distribute flanneld certificate files
+  copy:
+    src={{ local_template_dir }}/flanneld.pem
+    dest={{ flanneld_cert_dir }}/
+    owner={{ k8s_user }}
+    
+- name: Distribute flanneld certificate files
+  copy:
+    src={{ local_template_dir }}/flanneld-key.pem
+    dest={{ flanneld_cert_dir }}/
+    owner={{ k8s_user }}
+    
+- name: Generate flanneld service file
+  template:
+    src=templates/flanneld.service.j2
+    dest={{ local_template_dir }}/flanneld.service
+  connection: local
+  run_once: yes
+
+- name: Distribute flanneld service file
+  copy:
+    src={{ local_template_dir }}/flanneld.service
+    dest=/etc/systemd/system/flanneld.service
+    
+- name: Copy update-flanneld script
+  template:
+    src=templates/update-flanneld.sh.j2
+    dest={{ package_dir }}/update-flanneld.sh
+    mode=0755
+
+- name: Write networrk information to etcd cluster
+  shell:
+    sh {{ package_dir }}/update-flanneld.sh
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: yes
+
+- name: Start flanneld service
+  service:
+    name=flanneld
+    state=started
+    enabled=yes
+    
