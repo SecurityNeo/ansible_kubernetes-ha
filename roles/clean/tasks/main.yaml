@@ -1,0 +1,11 @@
+- name: Delete local_package_dir
+  shell:
+    rm -rf {{ local_package_dir }}
+  connection: local
+  run_once: yes
+
+- name: Delete local_package_dir
+  shell:
+    rm -rf {{ local_template_dir }}
+  connection: local
+  run_once: yes

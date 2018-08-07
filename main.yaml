@@ -35,3 +35,9 @@
     - docker
     - kubelet
     - kube-proxy
+
+- hosts: all
+  vars_files:
+    - vars/main.yaml
+  roles:
+    - clean

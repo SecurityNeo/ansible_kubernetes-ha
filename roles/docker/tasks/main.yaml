@@ -52,7 +52,16 @@
     src=files/python-rhsm-certificates-{{ python_rhsm_version }}-1.el7.x86_64.rpm
     dest={{ package_dir }}/
 
+- name: Copy python-dateutil file
+  copy:
+    src=files/python-dateutil-1.5-7.el7.noarch.rpm
+    dest={{ package_dir }}
+
 - name: Install python rhsm
   shell:
-    rpm -ivh {{ package_dir }}/python-rhsm-{{ python_rhsm_version }}-1.el7.x86_64.rpm && rpm -ivh {{ package_dir }}/python-rhsm-certificates-{{ python_rhsm_version }}-1.el7.x86_64.rpm
+    cd {{ package_dir }} && rpm -ivh *.rpm
+
+- name: Delete rhsm rpm pachages
+  shell:
+    rm -rf {{ package_dir }}/*.rpm
 

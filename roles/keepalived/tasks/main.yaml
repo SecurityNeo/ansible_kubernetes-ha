@@ -45,3 +45,7 @@
     name=keepalived
     state=started
     enabled=yes
+
+- name: Delete keepalived_src_dir
+  shell:
+    rm -rf {{ keepalived_src_dir }}
