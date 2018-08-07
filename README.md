@@ -6,6 +6,24 @@
 - [Ansible](http://docs.ansible.com/intro_installation.html) 2.6.0
 
 ## 组件配置策略说明
+### kube-apiserver
+- 通过https对外提供服务，关闭http端口
+- 开启RBAC认证
+- 支持kubelet TLS bootstrapping
+- 每一个Master节点运行一个kube-apiserver服务，通过haproxy提供高可用，使用keepalived控制VIP漂移
+
+### kube-controller-manager
+- 每个Master节点运行一个服务，通过内部机制实现高可用
+- 自动approve 证书签名请求，证书过期后自动轮转
+- 使用SA访问kube-apiserver
+
+### kubelet
+- 关闭只读端口，拒绝匿名与非授权访问
+
+### kube-proxy
+- 使用kubeconfig访问apiserver
+- 内部负载均衡使用IPVS
+
 
 ## 组件版本
 组件名称|版本
