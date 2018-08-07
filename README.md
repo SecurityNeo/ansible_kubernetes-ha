@@ -2,7 +2,7 @@
 使用ansible离线安装kubernetes HA集群
 
 ## 测试版本
-- [Centos7](https://www.centos.org/)
+- [Centos7](https://www.centos.org/) 7.5
 - [Ansible](http://docs.ansible.com/intro_installation.html) 2.6.0
 
 ## 组件版本
@@ -64,8 +64,11 @@ master_servers|主节点信息
 worker_servers|工作节点信息
 
 ## 使用前提
-被控节点需正确配置yum源，能通过yum安装gcc等工具
-控制节点能免密连接被控节点
+- 被控节点需正确配置yum源，能通过yum安装gcc等工具
+- 控制节点能免密连接被控节点
+- 控制节点已安装ansible，如果无法在线安装，点击[我](https://pan.baidu.com/s/1ebVT7E0i672zGP2CoL4bUw)下载离线rpm包安装
 
 ## 使用方法
+```bash
 ansible-playbook main.yaml -i ansible-hosts
+```
