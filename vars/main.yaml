@@ -35,24 +35,24 @@ k8s_user: k8s
 
 
 master_servers: 
-- { name: 'k8s-api-1', ip: "172.25.144.85", port: "6443", node_name: "master01" }
-- { name: 'k8s-api-2', ip: "172.25.144.86", port: "6443", node_name: "master02" }
-- { name: 'k8s-api-3', ip: "172.25.144.87", port: "6443", node_name: "master03" }
+- { name: 'k8s-api-1', ip: "10.100.1.85", port: "6443", node_name: "master01" }
+- { name: 'k8s-api-2', ip: "10.100.1.86", port: "6443", node_name: "master02" }
+- { name: 'k8s-api-3', ip: "10.100.1.87", port: "6443", node_name: "master03" }
 
 worker_servers:
-- { ip: "172.25.144.81", node_name: "worker01" }
-- { ip: "172.25.144.82", node_name: "worker02" }
-- { ip: "172.25.144.83", node_name: "worker03" }
+- { ip: "10.100.1.81", node_name: "worker01" }
+- { ip: "10.100.1.82", node_name: "worker02" }
+- { ip: "10.100.1.83", node_name: "worker03" }
 
 haproxy_bind_port: 8443
 bind_interface: eth0
 service_cidr: 10.254.0.0/16
 cluster_cidr: 172.30.0.0/16
 node_port_range: 8400-9000
-master_vip: 172.25.144.88
-kube_apiserver: https://172.25.144.88:8443
-etcd_endpoints: https://172.25.144.85:2379,https://172.25.144.86:2379,https://172.25.144.87:2379
-etcd_nodes: master01=https://172.25.144.85:2380,master02=https://172.25.144.86:2380,master03=https://172.25.144.87:2380
+master_vip: 10.100.1.88
+kube_apiserver: https://10.100.1.88:8443
+etcd_endpoints: https://10.100.1.85:2379,https://10.100.1.86:2379,https://10.100.1.87:2379
+etcd_nodes: master01=https://10.100.1.85:2380,master02=https://10.100.1.86:2380,master03=https://10.100.1.87:2380
 flannel_etcd_prefix: /kubernetes/network
 cluster_kubernetes_svc_ip: 10.254.0.1
 cluster_dns_svc_ip: 10.254.0.2
