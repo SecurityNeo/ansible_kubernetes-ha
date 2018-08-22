@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cat << EOF >> /etc/hosts
+{% for nodes in master_servers %}
+{{ nodes.ip }} {{ nodes.node_name }}
+{% endfor %}
+{% for nodes in worker_servers %}
+{{ nodes.ip }} {{ nodes.node_name }}
+{% endfor %}
+EOF

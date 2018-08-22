@@ -176,3 +176,14 @@
 - name: Load kernel module
   shell:
     modprobe br_netfilter && modprobe ip_vs
+
+- name: Copy generate_hosts file templates script
+  template:
+    src=templates/generate_hosts_file.sh.j2
+    dest={{ package_dir }}/generate_hosts_file.sh
+    mode=0755
+
+- name: Update hosts file
+  shell:
+    sh {{ package_dir }}/generate_hosts_file.sh
+
