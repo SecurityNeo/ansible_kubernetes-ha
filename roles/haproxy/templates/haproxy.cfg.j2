@@ -28,6 +28,8 @@ listen stats
    bind     *:9000     
    mode     http
    stats    enable
+   stats    hide-version
+   stats    admin if TRUE
    stats    realm Haproxy\ Statistics
    stats    uri /
    stats    auth {{ haproxy_auth_name }}:{{ haproxy_auth_pass }}
