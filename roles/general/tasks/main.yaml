@@ -100,6 +100,7 @@
 - name: Stop dnsmasq
   shell:
     service dnsmasq stop && systemctl disable dnsmasq
+  ignore_errors: yes
 
 - name: Modify kernel parameter
   sysctl:
