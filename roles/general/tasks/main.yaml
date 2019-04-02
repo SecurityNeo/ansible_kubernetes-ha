@@ -20,7 +20,6 @@
   file:
     path={{ package_dir }}/bin/
     state=directory
-    owenr={{ k8s_user }}
 
 - name: Change package_dir's owenr
   file:
