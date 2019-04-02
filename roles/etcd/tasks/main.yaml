@@ -23,7 +23,7 @@
 
 - name: Distribute etcdctl
   copy:
-    src={{ local_package_dir }}/etcd/etcdctl
+    src={{ local_package_dir }}/etcd/etcd-v{{ etcd_version }}-linux-amd64/etcdctl
     dest={{ package_dir }}/bin/
     mode=0755
 
