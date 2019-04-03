@@ -11,7 +11,8 @@
 	    "{{ etcd_ip}}"
 	  {% else %}
 	    "{{ etcd_ip}}",
-    {% endfor %}
+       {% endif %}
+       {% endfor %}
     ],
     "names": [
       {
