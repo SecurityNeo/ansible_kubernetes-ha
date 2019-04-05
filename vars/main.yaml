@@ -60,5 +60,5 @@ cluster_dns_domain: cluster.local.
 haproxy_make_option: TARGET=linux2628 CPU=x86_64 USE_OPENSSL=1 USE_ZLIB=1 USE_PCRE=1
 encryption_key: Zs8dTG08K3BlA5TGKtKbjMOfHDd0wa92s+Y6RNDwtaE=
 docker_registry_mirrors:
-- { name: "hub-mirror", mirror-url: "https://hub-mirror.c.163.com" }
-- { name: "docker-mirror", mirror-url: "https://docker.mirrors.ustc.edu.cn" }
+- { name: "hub-mirror", mirror_url: "https://hub-mirror.c.163.com" }
+- { name: "docker-mirror", mirror_url: "https://docker.mirrors.ustc.edu.cn" }
