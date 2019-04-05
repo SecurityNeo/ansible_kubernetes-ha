@@ -1,4 +1,4 @@
 {
-    "registry-mirrors": [{% for registry in docker_registry_mirrors %}{% if loop.last %}"{{ registry.mirror-url }}"{% else %}"{{ registry.mirror-url}}",{% endif %}{% endfor %}],
+    "registry-mirrors": [{% for registry in docker_registry_mirrors %}{% if loop.last %}"{{ registry.mirror_url }}"{% else %}"{{ registry.mirror_url}}",{% endif %}{% endfor %}],
     "max-concurrent-downloads": 20
 }
